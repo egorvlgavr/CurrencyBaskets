@@ -55,14 +55,38 @@ public class Application {
             account.setBank("Raiffeisen");
             account.setAmountBase(new BigDecimal(10.5));
             account.setUpdated(new Date());
-            account.setPreviousId(1L);
+            account.setPreviousId(-1L);
             account.setVersion(1);
             account.setUser(usr1);
             account.setCurrency(currency);
             account.setRate(rate);
             accountRepository.save(account);
 
-            System.out.println(accountRepository.findAll());
+            Account account1 = new Account();
+            account1.setAmount(new BigDecimal(11.5));
+            account1.setAmountChange(new BigDecimal(1.0));
+            account1.setBank("Raiffeisen");
+            account1.setAmountBase(new BigDecimal(11.5));
+            account1.setAmountBaseChange(new BigDecimal(1.0));
+            account1.setUpdated(new Date());
+            account1.setPreviousId(1L);
+            account1.setVersion(2);
+            account1.setUser(usr1);
+            account1.setCurrency(currency);
+            account1.setRate(rate);
+            accountRepository.save(account1);
+
+            Account account2 = new Account();
+            account2.setAmount(new BigDecimal(22.1));
+            account2.setBank("Alfa-Bank");
+            account2.setAmountBase(new BigDecimal(22.1));
+            account2.setUpdated(new Date());
+            account2.setPreviousId(1L);
+            account2.setVersion(1);
+            account2.setUser(usr1);
+            account2.setCurrency(currency);
+            account2.setRate(rate);
+            accountRepository.save(account2);
         });
     }
 }
