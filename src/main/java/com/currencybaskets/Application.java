@@ -41,6 +41,10 @@ public class Application {
             currency.setName("USD");
             currencyRepository.save(currency);
 
+            Currency currency1 = new Currency();
+            currency1.setName("EUR");
+            currencyRepository.save(currency1);
+
             // Create rate
             Rate rate = new Rate();
             rate.setCurrency(currency);
@@ -87,6 +91,18 @@ public class Application {
             account2.setCurrency(currency);
             account2.setRate(rate);
             accountRepository.save(account2);
+
+            Account account3 = new Account();
+            account3.setAmount(new BigDecimal(75.1));
+            account3.setBank("Alfa-Bank");
+            account3.setAmountBase(new BigDecimal(75.1));
+            account3.setUpdated(new Date());
+            account3.setPreviousId(1L);
+            account3.setVersion(1);
+            account3.setUser(usr1);
+            account3.setCurrency(currency1);
+            account3.setRate(rate);
+            accountRepository.save(account3);
         });
     }
 }

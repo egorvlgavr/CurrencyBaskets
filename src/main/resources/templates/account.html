@@ -36,6 +36,7 @@
                 </th:block>
                 </tbody>
             </table>
+            <h4 th:text="'Total amount in rubles: ' + ${accountsWithRates.totalAmount}"></h4>
         </div>
         <div class="col-4">
             <table class="table">
@@ -52,6 +53,34 @@
                         <td th:text="${account.rate}">...</td>
                     </tr>
                 </th:block>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row justify-content-start">
+        <div class="col-4">
+            <table class="table">
+                <thead class="thead-dark">
+                <tr>
+                    <th></th>
+                    <th:block th:each="currency : ${accountsWithRates.aggregatedBaseAmounts.keySet()}">
+                        <th th:text="${currency}">cur</th>
+                    </th:block>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Amount</td>
+                    <th:block th:each="value : ${accountsWithRates.aggregatedBaseAmounts.values()}">
+                        <td th:text="${value.amount}">amount</td>
+                    </th:block>
+                </tr>
+                <tr>
+                    <td>Percents</td>
+                    <th:block th:each="value : ${accountsWithRates.aggregatedBaseAmounts.values()}">
+                        <td th:text="${value.percents} + '%'">percents</td>
+                    </th:block>
+                </tr>
                 </tbody>
             </table>
         </div>

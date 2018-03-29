@@ -1,7 +1,6 @@
 package com.currencybaskets.view;
 
 import com.currencybaskets.dao.model.Account;
-import com.currencybaskets.dao.model.Rate;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,13 +10,11 @@ import java.util.Date;
 public class AccountView {
     private Long id;
     private String bank;
-    // TODO store as map (currency_bank -> account)
     private String currency;
     private BigDecimal amount;
     private BigDecimal amountBase;
     private Date updated;
-    // TODO add percentage in base
-    // TODO add limit warning
+    // TODO add limit warning per bank
 
     public static AccountView fromEntity(Account entity) {
         AccountView view = new AccountView();

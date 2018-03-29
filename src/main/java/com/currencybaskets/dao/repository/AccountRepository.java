@@ -11,6 +11,6 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
             "WHERE a.id IN " +
             "(SELECT MAX(a.id) from Account a " +
             "WHERE a.user.id = ?1 " +
-            "GROUP BY a.bank)")
+            "GROUP BY a.bank, a.currency.id)")
     List<Account> findLatestAccountByUserId(Long userId);
 }
