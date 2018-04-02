@@ -53,6 +53,13 @@ public class Application {
             rate.setUpdated(new Date());
             rateRepository.save(rate);
 
+            Rate rate1 = new Rate();
+            rate1.setCurrency(currency1);
+            rate1.setVersion(0);
+            rate1.setRate(new BigDecimal(56.33));
+            rate1.setUpdated(new Date());
+            rateRepository.save(rate1);
+
             // Use all in account
             Account account = new Account();
             account.setAmount(new BigDecimal(10.5));
@@ -101,7 +108,7 @@ public class Application {
             account3.setVersion(1);
             account3.setUser(usr1);
             account3.setCurrency(currency1);
-            account3.setRate(rate);
+            account3.setRate(rate1);
             accountRepository.save(account3);
         });
     }
