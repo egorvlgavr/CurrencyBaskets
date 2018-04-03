@@ -1,4 +1,5 @@
-package com.currencybaskets.view;
+package com.currencybaskets.dao.model;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +8,7 @@ import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
-public class AggregatedAmountView {
+public class AggregatedAmount {
+    private Currency currency;
     private BigDecimal amount;
-    private BigDecimal percents;
 }

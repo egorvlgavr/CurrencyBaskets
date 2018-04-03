@@ -14,6 +14,4 @@ public class LatestAccountsView {
     private List<AccountView> accounts;
     private Set<RateView> rates;
     private BigDecimal totalAmount;
-    private Map<String, AggregatedAmountView> aggregatedBaseAmounts;
-
 }

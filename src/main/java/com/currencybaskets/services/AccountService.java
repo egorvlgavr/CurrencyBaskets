@@ -3,18 +3,16 @@ package com.currencybaskets.services;
 import com.currencybaskets.dao.model.Account;
 import com.currencybaskets.dao.model.Rate;
 import com.currencybaskets.dao.repository.AccountRepository;
+import com.currencybaskets.dto.AggregatedAmountDto;
 import com.currencybaskets.view.AccountView;
 import com.currencybaskets.view.LatestAccountsView;
-import com.currencybaskets.view.AggregatedAmountView;
 import com.currencybaskets.view.RateView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
-
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.reducing;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountService {
@@ -37,28 +35,13 @@ public class AccountService {
             }
             totalBase = totalBase.add(account.getAmountBase());
         }
-        Map<String, AggregatedAmountView> aggregated = aggregateBaseAmounts(accountViews, totalBase);
-        return new LatestAccountsView(accountViews, rates, totalBase, aggregated);
+        return new LatestAccountsView(accountViews, rates, totalBase);
     }
 
-    private static Map<String, AggregatedAmountView> aggregateBaseAmounts(List<AccountView> accounts,
-                                                                          BigDecimal total) {
-        Map<String, BigDecimal> aggregated = accounts.stream()
-                .collect(
-                        groupingBy(AccountView::getCurrency,
-                                reducing(new BigDecimal(0),
-                                        AccountView::getAmountBase,
-                                        BigDecimal::add
-                                )
-                        )
-                );
-        Map<String, AggregatedAmountView> result = new HashMap<>(aggregated.size());
-        for (Map.Entry<String, BigDecimal> entry : aggregated.entrySet()) {
-            BigDecimal percentage = entry.getValue()
-                    .divide(total, 2, BigDecimal.ROUND_HALF_UP)
-                    .multiply(HUNDRED);
-            result.put(entry.getKey(), new AggregatedAmountView(entry.getValue(), percentage));
-        }
-        return result;
+    public List<AggregatedAmountDto> getAggregatedAmount(Long userId) {
+        return accountRepository.aggregateCurrencyForLatestAccountsByUserId(userId)
+                .stream()
+                .map(AggregatedAmountDto::fromEntity)
+                .collect(Collectors.toList());
     }
 }
