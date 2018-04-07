@@ -22,8 +22,7 @@
 <body class="fixed-nav sticky-footer bg-dark" id="page-top">
   <!-- Navigation-->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
-    <!--TODO support user id by security!-->
-    <a class="navbar-brand" th:href="@{/account?userId=1}">Currency Baskets</a>
+    <a class="navbar-brand" th:href="@{/account}">Currency Baskets</a>
     <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -218,7 +217,7 @@
       <div class="card mb-3">
         <div class="card-header">
           <i class="fa fa-table"></i> Accounts</div>
-        <div class="card-body">
+        <div class="card-body"  th:fragment="accountTable">
           <div class="table-responsive">
             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
               <thead>
@@ -229,17 +228,19 @@
                 <th>Amount</th>
                 <th>Amount in Rubles</th>
                 <th>Updated</th>
+                <th></th>
               </tr>
               </thead>
               <tbody>
               <th:block th:each="account : ${accountsWithRates.accounts}">
                 <tr>
-                  <td th:text="${account.id}">...</td>
-                  <td th:text="${account.bank}">...</td>
-                  <td th:text="${account.currency}">...</td>
-                  <td th:text="${account.amount}">...</td>
-                  <td th:text="${account.amountBase}">...</td>
+                  <td th:id="'accountId' + ${account.id}" th:text="${account.id}">...</td>
+                  <td th:id="'accountBank' + ${account.id}" th:text="${account.bank}">...</td>
+                  <td th:id="'accountCurrency' + ${account.id}" th:text="${account.currency}">...</td>
+                  <td th:id="'accountAmount' + ${account.id}" th:text="${account.amount}">...</td>
+                  <td th:id="'accountAmountBase' + ${account.id}" th:text="${account.amountBase}">...</td>
                   <td th:text="${account.updated}">...</td>
+                  <td><i class="fa fa-pencil fa-fw" th:onclick="'showAccountModal(' + ${account.id} + ')'"></i></td>
                 </tr>
               </th:block>
               </tbody>
@@ -250,6 +251,61 @@
     </div>
     <!-- /.container-fluid-->
     <!-- /.content-wrapper-->
+
+    <!--Modals-->
+    <div class="modal fade" id="accountModal" tabindex="-1" role="dialog" aria-labelledby="accountModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="accountModalLabel">Update account</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+            <form action="#" th:action="@{/updateAccount}" th:object="${accountUpdate}" method="post" id="accountUpdateForm">
+              <div class="form-group row">
+                <div class="col-sm-2">
+                  <label>Id:</label>
+                </div>
+                <div class="col-sm-10">
+                  <input type="hidden" id="accountModalHiddenId" th:field="*{id}"/>
+                  <p id="accountModalId" class="form-control-static">789</p>
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-2">
+                  <label>Bank:</label>
+                </div>
+                <div class="col-sm-10">
+                  <p id="accountModalBank" class="form-control-static">Raifaisen</p>
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-2">
+                  <label>Currency:</label>
+                </div>
+                <div class="col-sm-10">
+                  <p id="accountModalCurrency" class="form-control-static">USD</p>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>New amount</label>
+                <input id="accountModalAmount" class="form-control" placeholder="New amount value" th:field="*{amount}"/>
+              </div>
+              <div class="form-group">
+                <label>New amount in Rubles</label>
+                <!--TODO set in on fly with jQuery-->
+                <p id="accountModalAmountBase" class="form-control-static">12,456</p>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" form="accountUpdateForm">Update</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/Modals-->
     <footer class="sticky-footer">
       <div class="container">
         <div class="text-center">
@@ -294,6 +350,7 @@
     <!-- Custom scripts for this page-->
     <script th:src="@{js/account-datatables.js}"></script>
     <script th:src="@{js/account-charts.js}"></script>
+    <script th:src="@{js/account-modals.js}"></script>
   </div>
 </body>
 
