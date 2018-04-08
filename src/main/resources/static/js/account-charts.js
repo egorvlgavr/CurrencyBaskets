@@ -5,9 +5,8 @@ Chart.defaults.global.defaultFontColor = '#292b2c';
 // -- Currency Pie Chart
 function drawPieChart() {
 
-    // TODO remove id
     var jsonData = $.ajax({
-        url: '/aggregated/amount?userId=1',
+        url: '/aggregated/amount',
         dataType: 'json'
     }).done(function (results) {
 
@@ -26,6 +25,7 @@ function drawPieChart() {
                 labels: labels,
                 datasets: [{
                     data: data,
+                    // TODO store Currency colors in database
                     backgroundColor: ['#85bb65', '#1761DC', '#FF5C00'],
                 }]
             }

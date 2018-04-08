@@ -5,11 +5,13 @@ import com.currencybaskets.dao.repository.UserRepository;
 import com.currencybaskets.dto.AccountUpdate;
 import com.currencybaskets.dto.AggregatedAmountDto;
 import com.currencybaskets.services.AccountService;
-import com.currencybaskets.view.LatestAccountsView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -44,8 +46,6 @@ public class AccountController {
     @PostMapping("/updateAccount")
     public String accountUpdate(@ModelAttribute("accountUpdate") AccountUpdate accountUpdate, Model model) {
         accountService.updateAccountAmount(accountUpdate);
-        LatestAccountsView updated = accountService.getUserLatestAccounts(USER_ID_FIXTURE);
-        model.addAttribute("accountsWithRates", updated);
         // TODO update only part of page
         return "redirect:/account";
     }
