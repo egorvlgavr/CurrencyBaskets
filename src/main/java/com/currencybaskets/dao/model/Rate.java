@@ -14,7 +14,7 @@ import java.util.Set;
 @Entity
 @Table(name = "rates")
 @ToString(exclude = "accounts")
-@EqualsAndHashCode(exclude = "accounts")
+@EqualsAndHashCode(exclude = {"accounts", "id"})
 @NoArgsConstructor
 public class Rate {
     @Id

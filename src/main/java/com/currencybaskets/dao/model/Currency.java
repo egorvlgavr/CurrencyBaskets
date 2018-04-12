@@ -12,7 +12,7 @@ import java.util.Set;
 @Entity
 @Table(name = "currency")
 @ToString(exclude = "accounts")
-@EqualsAndHashCode(exclude = "accounts")
+@EqualsAndHashCode(exclude = {"accounts", "id"})
 @NoArgsConstructor
 public class Currency {
 
