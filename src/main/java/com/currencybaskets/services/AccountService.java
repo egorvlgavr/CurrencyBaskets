@@ -53,6 +53,7 @@ public class AccountService {
         if (previous != null) {
             Account incrementalUpdate = createIncrementalUpdate(previous, new BigDecimal(update.getAmount()));
             accountRepository.save(incrementalUpdate);
+            log.debug("Update account with id={} on amount={}", previous.getId(), update.getAmount());
         } else {
             // TODO throw error and handle it properly
             log.error("Not found account for id={}", update.getId());
