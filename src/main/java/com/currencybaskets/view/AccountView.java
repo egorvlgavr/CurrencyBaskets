@@ -1,6 +1,7 @@
 package com.currencybaskets.view;
 
 import com.currencybaskets.dao.model.Account;
+import com.currencybaskets.dao.model.User;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,6 +12,7 @@ public class AccountView {
     private Long id;
     private String bank;
     private String currency;
+    private String userFullName;
     private BigDecimal amount;
     private BigDecimal amountBase;
     private Date updated;
@@ -24,6 +26,8 @@ public class AccountView {
         view.setAmount(entity.getAmount());
         view.setAmountBase(entity.getAmountBase());
         view.setUpdated(entity.getUpdated());
+        User user = entity.getUser();
+        view.setUserFullName(user.getName() + " " + user.getSurname());
         return view;
     }
 }

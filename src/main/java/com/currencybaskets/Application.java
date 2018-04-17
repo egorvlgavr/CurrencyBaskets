@@ -12,6 +12,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -22,6 +23,8 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
+    // TODO remove it after migration to prod data
+    @Profile("!test")
     @Bean
     public CommandLineRunner demo(AccountRepository accountRepository,
                                   CurrencyRepository currencyRepository,
@@ -35,6 +38,13 @@ public class Application {
             usr1.setGroupId(2L);
             usr1.setColor("#DEB887");
             userRepository.save(usr1);
+
+            User usr2 = new User();
+            usr2.setName("Petr");
+            usr2.setSurname("Petrov");
+            usr2.setGroupId(2L);
+            usr2.setColor("#DEB889");
+            userRepository.save(usr2);
 
             // Create currency
             Currency currency = new Currency();
@@ -110,6 +120,18 @@ public class Application {
             account3.setCurrency(currency1);
             account3.setRate(rate1);
             accountRepository.save(account3);
+
+            Account account4 = new Account();
+            account4.setAmount(new BigDecimal(142.1));
+            account4.setBank("Alfa-Bank");
+            account4.setAmountBase(new BigDecimal(887.1));
+            account4.setUpdated(new Date());
+            account4.setPreviousId(1L);
+            account4.setVersion(1);
+            account4.setUser(usr2);
+            account4.setCurrency(currency1);
+            account4.setRate(rate1);
+            accountRepository.save(account4);
         });
     }
 }

@@ -123,7 +123,7 @@
         </li>
         <li class="breadcrumb-item active">Accounts</li>
       </ol>
-      <h3 th:text="'Account savings for ' + ${fullName}"></h3>
+      <h3 th:text="'Account savings for ' + ${fullNames}"></h3>
       <!--Cards, Rates and Baskets-->
       <div class="row mb-3">
         <!--Icons-->
@@ -223,6 +223,7 @@
               <thead>
               <tr>
                 <th>Id</th>
+                <th>User</th>
                 <th>Bank</th>
                 <th>Currency</th>
                 <th>Amount</th>
@@ -235,6 +236,7 @@
               <th:block th:each="account : ${accountsWithRates.accounts}">
                 <tr>
                   <td th:id="'accountId' + ${account.id}" th:text="${account.id}">...</td>
+                  <td th:id="'accountUserName' + ${account.id}" th:text="${account.userFullName}">...</td>
                   <td th:id="'accountBank' + ${account.id}" th:text="${account.bank}">...</td>
                   <td th:id="'accountCurrency' + ${account.id}" th:text="${account.currency}">...</td>
                   <td th:id="'accountAmount' + ${account.id}" th:text="${account.amount}">...</td>

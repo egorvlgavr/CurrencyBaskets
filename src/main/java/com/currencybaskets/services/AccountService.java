@@ -24,8 +24,8 @@ public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
-    public LatestAccountsView getUserLatestAccounts(Long userId) {
-        List<Account> latestAccountByUserId = accountRepository.findLatestAccountByUserId(userId);
+    public LatestAccountsView getUserLatestAccounts(List<Long> userIds) {
+        List<Account> latestAccountByUserId = accountRepository.findLatestAccountByUserIds(userIds);
         List<AccountView> accountViews = new ArrayList<>(latestAccountByUserId.size());
         Set<RateView> rates = new HashSet<>();
         BigDecimal totalBase = new BigDecimal(0);
@@ -40,8 +40,8 @@ public class AccountService {
         return new LatestAccountsView(accountViews, rates, totalBase);
     }
 
-    public List<AggregatedAmountDto> getAggregatedAmount(Long userId) {
-        return accountRepository.aggregateCurrencyForLatestAccountsByUserId(userId)
+    public List<AggregatedAmountDto> getAggregatedAmount(List<Long> userIds) {
+        return accountRepository.aggregateCurrencyForLatestAccountsByUserIds(userIds)
                 .stream()
                 .map(AggregatedAmountDto::fromEntity)
                 .collect(Collectors.toList());

@@ -3,6 +3,7 @@ package com.currencybaskets.services;
 import com.currencybaskets.dao.model.Account;
 import com.currencybaskets.dao.model.Currency;
 import com.currencybaskets.dao.model.Rate;
+import com.currencybaskets.dao.model.User;
 import com.currencybaskets.dao.repository.AccountRepository;
 import com.currencybaskets.dto.AccountUpdate;
 import com.currencybaskets.view.AccountView;
@@ -21,10 +22,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -54,14 +52,21 @@ public class AccountServiceTest {
 
     @Test
     public void getUserLatestAccounts() throws Exception {
-        long userId = 1L;
-        when(repository.findLatestAccountByUserId(userId)).thenReturn(stubbedAccounts());
-        LatestAccountsView actual = service.getUserLatestAccounts(userId);
+        List<Long> userIds = Collections.singletonList(1L);
+        when(repository.findLatestAccountByUserIds(userIds)).thenReturn(stubbedAccounts());
+        LatestAccountsView actual = service.getUserLatestAccounts(userIds);
         assertTrue(
                 actual.getAccounts()
                         .stream()
                         .map(AccountView::getCurrency)
                         .allMatch(CURRENCY_NAME::equals)
+        );
+
+        assertTrue(
+                actual.getAccounts()
+                        .stream()
+                        .map(AccountView::getUserFullName)
+                        .allMatch("n1 sn1"::equals)
         );
         assertThat(actual.getTotalAmount(),  Matchers.comparesEqualTo(new BigDecimal(111)));
         Set<RateView> actualRates = actual.getRates();
@@ -72,10 +77,13 @@ public class AccountServiceTest {
     private static List<Account> stubbedAccounts() {
         Rate rate = rate();
         Currency cur = rate.getCurrency();
+        User usr = new User();
+        usr.setName("n1");
+        usr.setSurname("sn1");
         return Arrays.asList(
-                stubbedAccount(cur, rate, 1),
-                stubbedAccount(cur, null, 10),
-                stubbedAccount(cur, rate, 100)
+                stubbedAccount(usr, cur, rate, 1),
+                stubbedAccount(usr, cur, null, 10),
+                stubbedAccount(usr, cur, rate, 100)
         );
     }
 
@@ -88,10 +96,11 @@ public class AccountServiceTest {
         return rate;
     }
 
-    private static Account stubbedAccount(Currency currency, Rate rate, int baseAmount) {
+    private static Account stubbedAccount(User user, Currency currency, Rate rate, int baseAmount) {
         Account account = new Account();
         account.setCurrency(currency);
         account.setRate(rate);
+        account.setUser(user);
         account.setAmountBase(new BigDecimal(baseAmount));
         return account;
     }

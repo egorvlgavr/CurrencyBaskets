@@ -6,4 +6,5 @@ spring:
     jpa:
         show-sql: true
         hibernate:
+#        TODO remove after prod migration
           ddl-auto: create-drop
