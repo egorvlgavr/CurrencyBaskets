@@ -1,6 +1,7 @@
 package com.currencybaskets.dao.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import java.util.Date;
 @Entity
 @Table(name = "accounts")
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = {"id", "updated"})
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
