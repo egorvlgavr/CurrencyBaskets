@@ -6,6 +6,7 @@ import com.currencybaskets.dto.AggregatedAmountDto;
 import com.currencybaskets.services.AccountService;
 import com.currencybaskets.view.AccountView;
 import com.currencybaskets.view.LatestAccountsView;
+import com.currencybaskets.view.RateUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,6 +42,7 @@ public class AccountController {
                 .collect(Collectors.joining(", "));
         model.addAttribute("fullNames", fullNames);
         model.addAttribute("accountUpdate", new AccountUpdate());
+        model.addAttribute("rateUpdate", new RateUpdate());
         return "account";
     }
 
@@ -52,8 +54,15 @@ public class AccountController {
     }
 
     @PostMapping("/updateAccount")
-    public String accountUpdate(@ModelAttribute("accountUpdate") AccountUpdate accountUpdate, Model model) {
+    public String accountUpdate(@ModelAttribute("accountUpdate") AccountUpdate accountUpdate) {
         accountService.updateAccountAmount(accountUpdate);
+        // TODO update only part of page
+        return "redirect:/account";
+    }
+
+    @PostMapping("/updateRate")
+    public String rateUpdate(@ModelAttribute("rateUpdate") RateUpdate rateUpdate) {
+        accountService.updateBaseAmountForRate(rateUpdate);
         // TODO update only part of page
         return "redirect:/account";
     }

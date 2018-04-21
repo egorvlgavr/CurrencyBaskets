@@ -7,6 +7,7 @@ import com.currencybaskets.dto.AccountUpdate;
 import com.currencybaskets.dto.AggregatedAmountDto;
 import com.currencybaskets.view.AccountView;
 import com.currencybaskets.view.LatestAccountsView;
+import com.currencybaskets.view.RateUpdate;
 import com.currencybaskets.view.RateView;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,5 +96,9 @@ public class AccountService {
         updated.setAmountBaseChange(newAmountBase.subtract(previous.getAmountBase()));
         updated.setUpdated(new Date());
         return updated;
+    }
+
+    public void updateBaseAmountForRate(RateUpdate rateUpdate) {
+        // TODO implement flow
     }
 }

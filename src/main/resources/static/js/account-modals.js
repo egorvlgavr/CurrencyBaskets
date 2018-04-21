@@ -16,3 +16,15 @@ function showAccountModal(id) {
   // show modal
   $('#accountModal').modal('show');
 }
+
+function showRateModal(id) {
+    // build modal form with proper data
+    $('#rateModalId').text(id);
+    $('#rateModalHiddenId').val(id);
+    var currency = $('#rateCurrency' + id).text();
+    $('#rateModalCurrency').text(currency);
+    var rate = $('#rateRate' + id).text();
+    $('#rateModalRate').val(rate);
+    // show modal
+    $('#rateModal').modal('show');
+}
