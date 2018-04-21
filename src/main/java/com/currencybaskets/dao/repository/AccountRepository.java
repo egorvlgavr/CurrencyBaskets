@@ -23,4 +23,11 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
             "   GROUP BY a.bank, a.currency.id, a.user.id)" +
             "GROUP BY a.currency.id")
     List<AggregatedAmount> aggregateCurrencyForLatestAccountsByUserIds(List<Long> userIds);
+
+    @Query("SELECT a FROM Account a " +
+            "WHERE a.id IN " +
+            "(SELECT MAX(a.id) from Account a " +
+            "WHERE a.rate.id = ?1 " +
+            "GROUP BY a.bank, a.currency.id, a.user.id)")
+    List<Account> findLatestAccountByRateId(Long rateId);
 }

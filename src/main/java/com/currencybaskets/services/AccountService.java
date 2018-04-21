@@ -3,6 +3,7 @@ package com.currencybaskets.services;
 import com.currencybaskets.dao.model.Account;
 import com.currencybaskets.dao.model.Rate;
 import com.currencybaskets.dao.repository.AccountRepository;
+import com.currencybaskets.dao.repository.RateRepository;
 import com.currencybaskets.dto.AccountUpdate;
 import com.currencybaskets.dto.AggregatedAmountDto;
 import com.currencybaskets.view.AccountView;
@@ -24,6 +25,9 @@ public class AccountService {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private RateRepository rateRepository;
 
     public LatestAccountsView getUserLatestAccounts(List<Long> userIds) {
         List<Account> latestAccountByUserId = accountRepository.findLatestAccountByUserIds(userIds);
@@ -55,7 +59,7 @@ public class AccountService {
     }
 
     private static Date latest(Date left, Date right) {
-        return  left.after(right) ? left : right;
+        return left.after(right) ? left : right;
     }
 
     public List<AggregatedAmountDto> getAggregatedAmount(List<Long> userIds) {
@@ -69,16 +73,16 @@ public class AccountService {
     public void updateAccountAmount(AccountUpdate update) {
         Account previous = accountRepository.findOne(update.getId());
         if (previous != null) {
-            Account incrementalUpdate = createIncrementalUpdate(previous, new BigDecimal(update.getAmount()));
+            Account incrementalUpdate = createAccountAmountUpdate(previous, new BigDecimal(update.getAmount()));
             accountRepository.save(incrementalUpdate);
             log.debug("Update account with id={} on amount={}", previous.getId(), update.getAmount());
         } else {
-            // TODO throw error and handle it properly
+            // TODO throw exception and handle it properly
             log.error("Not found account for id={}", update.getId());
         }
     }
 
-    private static Account createIncrementalUpdate(Account previous, BigDecimal newAmount) {
+    private static Account createAccountAmountUpdate(Account previous, BigDecimal newAmount) {
         Account updated = new Account();
         updated.setBank(previous.getBank());
         updated.setCurrency(previous.getCurrency());
@@ -98,7 +102,52 @@ public class AccountService {
         return updated;
     }
 
-    public void updateBaseAmountForRate(RateUpdate rateUpdate) {
-        // TODO implement flow
+    public void updateAccountsRate(RateUpdate update) {
+        Rate previousRate = rateRepository.findOne(update.getId());
+        if (Objects.isNull(previousRate)) {
+            // TODO throw exception and handle it properly
+            log.error("No rate with id={}", update.getId());
+            return;
+        }
+        Rate rate = rateRepository.save(createRateUpdate(previousRate, update.getRate()));
+        List<Account> accountsToUpdate = accountRepository.findLatestAccountByRateId(update.getId());
+        if (accountsToUpdate.isEmpty()) {
+            log.warn("No accounts with rate id={}", update.getId());
+            return;
+        }
+        List<Account> updatedAccounts = accountsToUpdate.stream()
+                .map(toUpdate -> {
+                    log.debug("Update account with id={} on rate={}", toUpdate.getId(), update.getRate());
+                    return createAccountRateUpdate(toUpdate, rate);
+                })
+                .collect(Collectors.toList());
+        accountRepository.save(updatedAccounts);
+    }
+
+    private static Rate createRateUpdate(Rate previous, BigDecimal newRate) {
+        Rate updated = new Rate();
+        updated.setCurrency(previous.getCurrency());
+        updated.setRate(newRate);
+        updated.setUpdated(new Date());
+        updated.setVersion(previous.getVersion() + 1);
+        return updated;
+    }
+
+    private static Account createAccountRateUpdate(Account previous, Rate newRate) {
+        Account updated = new Account();
+        updated.setBank(previous.getBank());
+        updated.setCurrency(previous.getCurrency());
+        updated.setUser(previous.getUser());
+        updated.setRate(newRate);
+        updated.setPreviousId(previous.getId());
+        updated.setVersion(previous.getVersion() + 1);
+        BigDecimal amount = previous.getAmount();
+        updated.setAmount(amount);
+        updated.setAmountChange(previous.getAmountChange());
+        BigDecimal newAmountBase = amount.multiply(newRate.getRate());
+        updated.setAmountBase(newAmountBase);
+        updated.setAmountBaseChange(newAmountBase.subtract(previous.getAmountBase()));
+        updated.setUpdated(new Date());
+        return updated;
     }
 }

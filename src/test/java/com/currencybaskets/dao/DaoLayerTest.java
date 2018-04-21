@@ -36,6 +36,7 @@ public class DaoLayerTest {
 
     private Long userId1;
     private Long userId2;
+    private Long rate2Id;
 
     @Autowired
     private TestEntityManager entityManager;
@@ -92,12 +93,13 @@ public class DaoLayerTest {
         r2.setVersion(0);
         r2.setRate(R2_RATE);
         r2.setUpdated(new Date());
-        entityManager.persist(r2);
+        rate2Id = entityManager.persistAndGetId(r2, Long.class);
 
         String b1 = "b1";
         String b2 = "b2";
 
         createAndPersistAccount(c1, b1, r1, usr1);
+        createAndPersistAccount(c1, b1, r2, usr1);
         createAndPersistAccount(c1, b1, r2, usr1);
 
         createAndPersistAccount(c1, b2, r1, usr1);
@@ -172,6 +174,12 @@ public class DaoLayerTest {
     public void testGetUserIdInSameGroup() throws Exception {
         List<Long> userIds = userRepository.getUserIdsInSameGroup(userId1);
         assertThat(userIds, containsInAnyOrder(userId1, userId2));
+    }
+
+    @Test
+    public void testFindLatestAccountByRateId() throws Exception {
+        List<Account> actual = accountRepository.findLatestAccountByRateId(rate2Id);
+        assertEquals(actual.size(), 5);
     }
 
 }

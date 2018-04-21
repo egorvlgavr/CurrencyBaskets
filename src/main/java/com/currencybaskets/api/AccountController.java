@@ -62,7 +62,7 @@ public class AccountController {
 
     @PostMapping("/updateRate")
     public String rateUpdate(@ModelAttribute("rateUpdate") RateUpdate rateUpdate) {
-        accountService.updateBaseAmountForRate(rateUpdate);
+        accountService.updateAccountsRate(rateUpdate);
         // TODO update only part of page
         return "redirect:/account";
     }

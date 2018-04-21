@@ -5,14 +5,13 @@ import com.currencybaskets.dao.model.Currency;
 import com.currencybaskets.dao.model.Rate;
 import com.currencybaskets.dao.model.User;
 import com.currencybaskets.dao.repository.AccountRepository;
+import com.currencybaskets.dao.repository.RateRepository;
 import com.currencybaskets.dto.AccountUpdate;
 import com.currencybaskets.view.AccountView;
 import com.currencybaskets.view.LatestAccountsView;
+import com.currencybaskets.view.RateUpdate;
 import com.currencybaskets.view.RateView;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
+import org.hamcrest.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +51,9 @@ public class AccountServiceTest {
 
     @MockBean
     private AccountRepository repository;
+
+    @MockBean
+    private RateRepository rateRepository;
 
     @Test
     public void getUserLatestAccounts() throws Exception {
@@ -102,6 +104,7 @@ public class AccountServiceTest {
         rate.setCurrency(cur);
         rate.setRate(new BigDecimal(7.31));
         rate.setUpdated(updated);
+        rate.setVersion(1);
         return rate;
     }
 
@@ -134,10 +137,8 @@ public class AccountServiceTest {
                    return  (incremental.getAmount().intValue() == 70)
                            && (incremental.getAmountChange().intValue() == 50)
                            && (incremental.getVersion() == 2)
-                           && (incremental.getAmountBase()
-                           .subtract(new BigDecimal(511.69)).abs().floatValue() <= 0.1)
-                           && (incremental.getAmountBaseChange()
-                           .subtract(new BigDecimal(365.49)).abs().floatValue() <= 0.1);
+                           && isEqualWithDelta(incremental.getAmountBase(), 511.69)
+                           && isEqualWithDelta(incremental.getAmountBaseChange(), 365.49);
                }
                return false;
            }
@@ -159,5 +160,53 @@ public class AccountServiceTest {
         account.setAmount(new BigDecimal(20));
         account.setAmountBase(new BigDecimal(146.2));
         return account;
+    }
+
+    @Test
+    public void updateAccountsRate() throws Exception {
+        long previousRateId = 1L;
+        BigDecimal newRate = new BigDecimal(2.2);
+        RateUpdate update = new RateUpdate();
+        update.setId(previousRateId);
+        update.setRate(newRate);
+        Rate previousRate = rate(LATEST_DATE);
+        when(rateRepository.findOne(previousRateId)).thenReturn(previousRate);
+        Rate updatedRate = new Rate();
+        updatedRate.setVersion(2);
+        updatedRate.setRate(newRate);
+        Currency cur = new Currency();
+        cur.setName(CURRENCY_NAME);
+        when(rateRepository.save(any(Rate.class))).thenReturn(updatedRate);
+        when(repository.findLatestAccountByRateId(previousRateId))
+                .thenReturn(Collections.singletonList(previousAccount()));
+        service.updateAccountsRate(update);
+        verify(repository, atLeastOnce()).save(argThat(isRateUpdated(newRate)));
+    }
+
+    private static Matcher<Iterable<Account>> isRateUpdated(BigDecimal newRate) {
+        return new BaseMatcher<Iterable<Account>>() {
+            @SuppressWarnings("unchecked")
+            @Override
+            public boolean matches(Object item) {
+                Iterator<Account> iterator = ((Iterable<Account>) item).iterator();
+                if (!iterator.hasNext()) {
+                    return false;
+                }
+                Account account = iterator.next();
+                return account.getVersion().equals(2)
+                        && account.getRate().getRate().equals(newRate)
+                        && isEqualWithDelta(account.getAmountBase(), 44)
+                        && isEqualWithDelta(account.getAmountBaseChange(), -102.2);
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Rates must be update.");
+            }
+        };
+    }
+
+    private static boolean isEqualWithDelta(BigDecimal expected, double actual) {
+       return expected.subtract(new BigDecimal(actual)).abs().floatValue() <= 0.1;
     }
 }
