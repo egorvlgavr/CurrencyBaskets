@@ -28,16 +28,33 @@ public class AccountService {
         List<Account> latestAccountByUserId = accountRepository.findLatestAccountByUserIds(userIds);
         List<AccountView> accountViews = new ArrayList<>(latestAccountByUserId.size());
         Set<RateView> rates = new HashSet<>();
+        Date latestRatesUpdated = null;
         BigDecimal totalBase = new BigDecimal(0);
         for (Account account : latestAccountByUserId) {
             accountViews.add(AccountView.fromEntity(account));
             Rate rate = account.getRate();
             if (Objects.nonNull(rate)) {
                 rates.add(RateView.fromEntity(rate));
+
+                Date updated = rate.getUpdated();
+                if (Objects.nonNull(updated)) {
+                    if (Objects.isNull(latestRatesUpdated)) {
+                        latestRatesUpdated = updated;
+                    } else {
+                        latestRatesUpdated = latest(updated, latestRatesUpdated);
+                    }
+                } else {
+                    log.warn("Rate={} with null updated field", rate.getId());
+                }
+
             }
             totalBase = totalBase.add(account.getAmountBase());
         }
-        return new LatestAccountsView(accountViews, rates, totalBase);
+        return new LatestAccountsView(accountViews, rates, latestRatesUpdated, totalBase);
+    }
+
+    private static Date latest(Date left, Date right) {
+        return  left.after(right) ? left : right;
     }
 
     public List<AggregatedAmountDto> getAggregatedAmount(List<Long> userIds) {

@@ -36,6 +36,9 @@ public class AccountServiceTest {
 
     private static final String CURRENCY_NAME = "test_currency";
 
+    private static Date LATEST_DATE = new GregorianCalendar(2017, Calendar.FEBRUARY, 11).getTime();
+    private static Date NOT_LATEST_DATE = new GregorianCalendar(2017, Calendar.JANUARY, 11).getTime();
+
     @TestConfiguration
     static class AccountServiceTestConfiguration {
         @Bean
@@ -68,14 +71,17 @@ public class AccountServiceTest {
                         .map(AccountView::getUserFullName)
                         .allMatch("n1 sn1"::equals)
         );
-        assertThat(actual.getTotalAmount(),  Matchers.comparesEqualTo(new BigDecimal(111)));
+        assertThat(actual.getTotalAmount(),  Matchers.comparesEqualTo(new BigDecimal(1111)));
         Set<RateView> actualRates = actual.getRates();
         assertEquals(actualRates.size(), 1);
         assertTrue(actualRates.stream().noneMatch(Objects::isNull));
+        assertEquals(actual.getLatestRatesUpdated(), LATEST_DATE);
     }
 
     private static List<Account> stubbedAccounts() {
-        Rate rate = rate();
+        Rate rate = rate(NOT_LATEST_DATE);
+        Rate rateLatest = rate(LATEST_DATE);
+        Rate rateNullUpdated = rate(null);
         Currency cur = rate.getCurrency();
         User usr = new User();
         usr.setName("n1");
@@ -83,16 +89,19 @@ public class AccountServiceTest {
         return Arrays.asList(
                 stubbedAccount(usr, cur, rate, 1),
                 stubbedAccount(usr, cur, null, 10),
-                stubbedAccount(usr, cur, rate, 100)
+                stubbedAccount(usr, cur, rateNullUpdated, 100),
+                stubbedAccount(usr, cur, rateLatest, 1000)
         );
     }
 
-    private static Rate rate() {
+
+    private static Rate rate(Date updated) {
         Currency cur = new Currency();
         cur.setName(CURRENCY_NAME);
         Rate rate = new Rate();
         rate.setCurrency(cur);
         rate.setRate(new BigDecimal(7.31));
+        rate.setUpdated(updated);
         return rate;
     }
 
@@ -141,7 +150,7 @@ public class AccountServiceTest {
     }
 
     private static Account previousAccount() {
-        Rate rate = rate();
+        Rate rate = rate(LATEST_DATE);
         Account account = new Account();
         account.setId(1L);
         account.setCurrency(rate.getCurrency());

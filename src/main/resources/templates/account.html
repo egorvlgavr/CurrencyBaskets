@@ -209,7 +209,11 @@
               </div>
             </div>
             <!--TODO correct date-->
-            <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+            <div class="card-footer small text-muted">
+              <span th:text="*{accountsWithRates.latestRatesUpdated != null}? ('Updated ' +  ${#dates.format(accountsWithRates.latestRatesUpdated, 'dd-MM-yyyy HH:mm')}) :'(no rates specified)'">
+                Updated ...
+              </span>
+            </div>
           </div>
         </div>
       </div>
