@@ -6,16 +6,14 @@ import com.currencybaskets.dao.repository.AccountRepository;
 import com.currencybaskets.dao.repository.RateRepository;
 import com.currencybaskets.dto.AccountUpdate;
 import com.currencybaskets.dto.AggregatedAmountDto;
-import com.currencybaskets.view.AccountView;
-import com.currencybaskets.view.LatestAccountsView;
-import com.currencybaskets.view.RateUpdate;
-import com.currencybaskets.view.RateView;
+import com.currencybaskets.view.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,7 +53,41 @@ public class AccountService {
             }
             totalBase = totalBase.add(account.getAmountBase());
         }
-        return new LatestAccountsView(accountViews, rates, latestRatesUpdated, totalBase);
+        ZonedDateTime now = ZonedDateTime.now();
+        Date monthAgo = Date.from(now.minusMonths(1).toInstant());
+        Date weekAgo = Date.from(now.minusWeeks(1).toInstant());
+
+        return LatestAccountsView.builder()
+                .accounts(accountViews)
+                .rates(rates)
+                .latestRatesUpdated(latestRatesUpdated)
+                .totalAmount(totalBase)
+                .weekBaseAmountChange(findAmountBaseChange(totalBase, userIds, weekAgo))
+                .monthBaseAmountChange(findAmountBaseChange(totalBase, userIds, monthAgo))
+                .build();
+    }
+
+    private AmountChangeView findAmountBaseChange(BigDecimal currentAmount, List<Long> userIds, Date from) {
+        BigDecimal previousAmount = accountRepository.sumOfBaseAmountsForUserIdsLessThan(userIds, from);
+        BigDecimal change = Objects.nonNull(previousAmount)
+                ? currentAmount.subtract(previousAmount)
+                : BigDecimal.ZERO;
+        String background = attributeBasedOnChange(change, "bg-success", "bg-danger", "bg-primary");
+        String icon = attributeBasedOnChange(change, "fa-long-arrow-up", "fa-long-arrow-down", "fa-ban");
+        return new AmountChangeView(change, background, icon);
+    }
+
+    private static String attributeBasedOnChange(BigDecimal value, String possitive,
+                                          String negative, String zero) {
+        String result;
+        if (value.compareTo(BigDecimal.ZERO) > 0) {
+            result = possitive;
+        } else if (value.compareTo(BigDecimal.ZERO) < 0) {
+            result = negative;
+        } else {
+            result = zero;
+        }
+        return result;
     }
 
     private static Date latest(Date left, Date right) {

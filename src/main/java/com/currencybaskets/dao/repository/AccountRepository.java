@@ -5,6 +5,8 @@ import com.currencybaskets.dao.model.AggregatedAmount;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 public interface AccountRepository extends CrudRepository<Account, Long> {
@@ -30,4 +32,11 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
             "WHERE a.rate.id = ?1 " +
             "GROUP BY a.bank, a.currency.id, a.user.id)")
     List<Account> findLatestAccountByRateId(Long rateId);
+
+    @Query("SELECT SUM(a.amountBase) FROM Account a " +
+            "WHERE a.id IN " +
+            "(SELECT MAX(a.id) from Account a " +
+            "WHERE a.user.id IN ?1 AND a.updated <= ?2 " +
+            "GROUP BY a.bank, a.currency.id, a.user.id)")
+    BigDecimal sumOfBaseAmountsForUserIdsLessThan(List<Long> userIds, Date date);
 }
