@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Objects;
 
 @Data
 @Entity
@@ -55,4 +57,38 @@ public class Account {
     @Column(name = "updated")
     @Temporal(TemporalType.DATE)
     private Date updated;
+
+    public Account createAccountAmountUpdate(BigDecimal newAmount) {
+        Account updated = new Account();
+        updated.setBank(bank);
+        updated.setCurrency(currency);
+        updated.setUser(user);
+        updated.setRate(rate);
+        updated.setPreviousId(id);
+        updated.setVersion(version + 1);
+        updated.setAmount(newAmount);
+        updated.setAmountChange(newAmount.subtract(amount));
+        BigDecimal newAmountBase = Objects.nonNull(rate) ? newAmount.multiply(rate.getRate()) : newAmount;
+        updated.setAmountBase(newAmountBase);
+        updated.setAmountBaseChange(newAmountBase.subtract(amountBase));
+        updated.setUpdated(Date.from(ZonedDateTime.now().toInstant()));
+        return updated;
+    }
+
+    public Account createAccountRateUpdate(Rate newRate) {
+        Account updated = new Account();
+        updated.setBank(bank);
+        updated.setCurrency(currency);
+        updated.setUser(user);
+        updated.setRate(newRate);
+        updated.setPreviousId(id);
+        updated.setVersion(version + 1);
+        updated.setAmount(amount);
+        updated.setAmountChange(amountChange);
+        BigDecimal newAmountBase = amount.multiply(newRate.getRate());
+        updated.setAmountBase(newAmountBase);
+        updated.setAmountBaseChange(newAmountBase.subtract(amountBase));
+        updated.setUpdated(Date.from(ZonedDateTime.now().toInstant()));
+        return updated;
+    }
 }

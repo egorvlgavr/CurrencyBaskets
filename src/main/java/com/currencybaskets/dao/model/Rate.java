@@ -7,6 +7,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Set;
 
@@ -38,4 +39,13 @@ public class Rate {
 
     @OneToMany(mappedBy = "rate", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Account> accounts;
+
+    public Rate createRateUpdate(BigDecimal newRate) {
+        Rate updated = new Rate();
+        updated.setCurrency(currency);
+        updated.setRate(newRate);
+        updated.setUpdated(Date.from(ZonedDateTime.now().toInstant()));
+        updated.setVersion(version + 1);
+        return updated;
+    }
 }

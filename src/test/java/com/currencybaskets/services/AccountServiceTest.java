@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.argThat;
@@ -59,6 +60,7 @@ public class AccountServiceTest {
     public void getUserLatestAccounts() throws Exception {
         List<Long> userIds = Collections.singletonList(1L);
         when(repository.findLatestAccountByUserIds(userIds)).thenReturn(stubbedAccounts());
+        when(repository.sumOfBaseAmountsForUserIdsOnDate(any(), any())).thenReturn(new BigDecimal(1000));
         LatestAccountsView actual = service.getUserLatestAccounts(userIds);
         assertTrue(
                 actual.getAccounts()
@@ -74,6 +76,15 @@ public class AccountServiceTest {
                         .allMatch("n1 sn1"::equals)
         );
         assertThat(actual.getTotalAmount(),  Matchers.comparesEqualTo(new BigDecimal(1111)));
+
+        assertThat(actual.getWeekBaseAmountChange().getChange(),  Matchers.comparesEqualTo(new BigDecimal(111)));
+        assertThat(actual.getWeekBaseAmountChange().getBackground(),  is("bg-success"));
+        assertThat(actual.getWeekBaseAmountChange().getIcon(),  is("fa-long-arrow-up"));
+
+        assertThat(actual.getMonthBaseAmountChange().getChange(),  Matchers.comparesEqualTo(new BigDecimal(111)));
+        assertThat(actual.getMonthBaseAmountChange().getBackground(),  is("bg-success"));
+        assertThat(actual.getMonthBaseAmountChange().getIcon(),  is("fa-long-arrow-up"));
+
         Set<RateView> actualRates = actual.getRates();
         assertEquals(actualRates.size(), 1);
         assertTrue(actualRates.stream().noneMatch(Objects::isNull));

@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 @SpringBootApplication
@@ -55,27 +56,31 @@ public class Application {
             currency1.setName("EUR");
             currencyRepository.save(currency1);
 
+            ZonedDateTime now = ZonedDateTime.now();
+            Date monthAgo = Date.from(now.minusMonths(1).toInstant());
+            Date weekAgo = Date.from(now.minusWeeks(1).toInstant());
+
             // Create rate
             Rate rate = new Rate();
             rate.setCurrency(currency);
             rate.setVersion(0);
             rate.setRate(new BigDecimal(67.43));
-            rate.setUpdated(new Date());
+            rate.setUpdated(Date.from(now.toInstant()));
             rateRepository.save(rate);
 
             Rate rate1 = new Rate();
             rate1.setCurrency(currency1);
             rate1.setVersion(0);
             rate1.setRate(new BigDecimal(56.33));
-            rate1.setUpdated(new Date());
+            rate1.setUpdated(monthAgo);
             rateRepository.save(rate1);
 
             // Use all in account
             Account account = new Account();
-            account.setAmount(new BigDecimal(10.5));
+            account.setAmount(new BigDecimal(1000.5));
             account.setBank("Raiffeisen");
-            account.setAmountBase(new BigDecimal(10.5));
-            account.setUpdated(new Date());
+            account.setAmountBase(new BigDecimal(1000.5));
+            account.setUpdated(monthAgo);
             account.setPreviousId(-1L);
             account.setVersion(1);
             account.setUser(usr1);
@@ -89,7 +94,7 @@ public class Application {
             account1.setBank("Raiffeisen");
             account1.setAmountBase(new BigDecimal(11.5));
             account1.setAmountBaseChange(new BigDecimal(1.0));
-            account1.setUpdated(new Date());
+            account1.setUpdated(weekAgo);
             account1.setPreviousId(1L);
             account1.setVersion(2);
             account1.setUser(usr1);
@@ -113,7 +118,7 @@ public class Application {
             account3.setAmount(new BigDecimal(75.1));
             account3.setBank("Alfa-Bank");
             account3.setAmountBase(new BigDecimal(75.1));
-            account3.setUpdated(new Date());
+            account3.setUpdated(monthAgo);
             account3.setPreviousId(1L);
             account3.setVersion(1);
             account3.setUser(usr1);

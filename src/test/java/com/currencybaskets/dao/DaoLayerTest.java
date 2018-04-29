@@ -14,9 +14,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -32,7 +34,9 @@ public class DaoLayerTest {
     private static final String C1_NAME = "C1";
     private static final String C2_NAME = "C2";
     private static final BigDecimal AMOUNT_BASE = new BigDecimal(10.5);
+    private static final BigDecimal AMOUNT_BASE_PREVIOUS = new BigDecimal(5.5);
     private static final long GROUP_ID = 2L;
+    private static final ZonedDateTime NOW = ZonedDateTime.now();
 
     private Long userId1;
     private Long userId2;
@@ -98,36 +102,42 @@ public class DaoLayerTest {
         String b1 = "b1";
         String b2 = "b2";
 
-        createAndPersistAccount(c1, b1, r1, usr1);
-        createAndPersistAccount(c1, b1, r2, usr1);
-        createAndPersistAccount(c1, b1, r2, usr1);
 
-        createAndPersistAccount(c1, b2, r1, usr1);
-        createAndPersistAccount(c1, b2, r2, usr1);
+        Date monthAgo = Date.from(NOW.minusMonths(1).toInstant());
+        Date weekAgo = Date.from(NOW.minusWeeks(1).toInstant());
+        Date weekAndDay = Date.from(NOW.minusWeeks(1).minusDays(1).toInstant());
 
-        createAndPersistAccount(c2, b1, r1, usr1);
-        createAndPersistAccount(c2, b1, r2, usr1);
+        createAndPersistAccount(c1, b1, r1, usr1, monthAgo, AMOUNT_BASE_PREVIOUS);
+        createAndPersistAccount(c1, b1, r2, usr1, weekAndDay, AMOUNT_BASE_PREVIOUS);
+        createAndPersistAccount(c1, b1, r2, usr1, weekAgo, AMOUNT_BASE);
 
-        createAndPersistAccount(c2, b2, r1, usr1);
-        createAndPersistAccount(c2, b2, r2, usr1);
+        createAndPersistAccount(c1, b2, r1, usr1, monthAgo, AMOUNT_BASE_PREVIOUS);
+        createAndPersistAccount(c1, b2, r2, usr1, weekAgo, AMOUNT_BASE);
 
-        createAndPersistAccount(c2, b2, r1, usr2);
-        createAndPersistAccount(c2, b2, r2, usr2);
+        createAndPersistAccount(c2, b1, r1, usr1, monthAgo, AMOUNT_BASE_PREVIOUS);
+        createAndPersistAccount(c2, b1, r2, usr1, weekAgo, AMOUNT_BASE);
+
+        createAndPersistAccount(c2, b2, r1, usr1, monthAgo, AMOUNT_BASE_PREVIOUS);
+        createAndPersistAccount(c2, b2, r2, usr1, weekAgo, AMOUNT_BASE);
+
+        createAndPersistAccount(c2, b2, r1, usr2, monthAgo, AMOUNT_BASE_PREVIOUS);
+        createAndPersistAccount(c2, b2, r2, usr2, weekAgo, AMOUNT_BASE);
     }
 
     private void createAndPersistAccount(Currency currency, String bank,
-                                         Rate rate, User user) {
+                                         Rate rate, User user, Date date, BigDecimal base) {
         // Use all in account
         Account account = new Account();
         account.setAmount(new BigDecimal(10.5));
         account.setBank(bank);
-        account.setAmountBase(AMOUNT_BASE);
+        account.setAmountBase(base);
         account.setUpdated(new Date());
         account.setPreviousId(-1L);
         account.setVersion(1);
         account.setUser(user);
         account.setCurrency(currency);
         account.setRate(rate);
+        account.setUpdated(date);
         entityManager.persist(account);
     }
 
@@ -180,6 +190,21 @@ public class DaoLayerTest {
     public void testFindLatestAccountByRateId() throws Exception {
         List<Account> actual = accountRepository.findLatestAccountByRateId(rate2Id);
         assertEquals(actual.size(), 5);
+    }
+
+    @Test
+    public void testSumOfBaseAmountsForUserIdsOnDate() throws Exception {
+        BigDecimal monthSum = accountRepository.sumOfBaseAmountsForUserIdsOnDate(userIds(),
+                Date.from(NOW.minusMonths(1).toInstant()));
+        assertThat(monthSum, Matchers.comparesEqualTo(AMOUNT_BASE_PREVIOUS.multiply(new BigDecimal(5))));
+
+        BigDecimal weekSum = accountRepository.sumOfBaseAmountsForUserIdsOnDate(userIds(),
+                Date.from(NOW.minusDays(6).toInstant()));
+        assertThat(weekSum, Matchers.comparesEqualTo(AMOUNT_BASE.multiply(new BigDecimal(5))));
+
+        BigDecimal nullSum = accountRepository.sumOfBaseAmountsForUserIdsOnDate(userIds(),
+                Date.from(NOW.minusMonths(3).toInstant()));
+        assertTrue(Objects.isNull(nullSum));
     }
 
 }

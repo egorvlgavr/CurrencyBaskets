@@ -32,7 +32,7 @@ public class AccountService {
         List<AccountView> accountViews = new ArrayList<>(latestAccountByUserId.size());
         Set<RateView> rates = new HashSet<>();
         Date latestRatesUpdated = null;
-        BigDecimal totalBase = new BigDecimal(0);
+        BigDecimal totalBase = BigDecimal.ZERO;
         for (Account account : latestAccountByUserId) {
             accountViews.add(AccountView.fromEntity(account));
             Rate rate = account.getRate();
@@ -47,7 +47,7 @@ public class AccountService {
                         latestRatesUpdated = latest(updated, latestRatesUpdated);
                     }
                 } else {
-                    log.warn("Rate={} with null updated field", rate.getId());
+                    log.warn("Rate={} with null \"updated\" field", rate.getId());
                 }
 
             }
@@ -68,10 +68,8 @@ public class AccountService {
     }
 
     private AmountChangeView findAmountBaseChange(BigDecimal currentAmount, List<Long> userIds, Date from) {
-        BigDecimal previousAmount = accountRepository.sumOfBaseAmountsForUserIdsLessThan(userIds, from);
-        BigDecimal change = Objects.nonNull(previousAmount)
-                ? currentAmount.subtract(previousAmount)
-                : BigDecimal.ZERO;
+        BigDecimal previousAmount = accountRepository.sumOfBaseAmountsForUserIdsOnDate(userIds, from);
+        BigDecimal change = Objects.nonNull(previousAmount) ? currentAmount.subtract(previousAmount) : BigDecimal.ZERO;
         String background = attributeBasedOnChange(change, "bg-success", "bg-danger", "bg-primary");
         String icon = attributeBasedOnChange(change, "fa-long-arrow-up", "fa-long-arrow-down", "fa-ban");
         return new AmountChangeView(change, background, icon);
@@ -105,7 +103,7 @@ public class AccountService {
     public void updateAccountAmount(AccountUpdate update) {
         Account previous = accountRepository.findOne(update.getId());
         if (previous != null) {
-            Account incrementalUpdate = createAccountAmountUpdate(previous, new BigDecimal(update.getAmount()));
+            Account incrementalUpdate = previous.createAccountAmountUpdate(new BigDecimal(update.getAmount()));
             accountRepository.save(incrementalUpdate);
             log.debug("Update account with id={} on amount={}", previous.getId(), update.getAmount());
         } else {
@@ -114,26 +112,7 @@ public class AccountService {
         }
     }
 
-    private static Account createAccountAmountUpdate(Account previous, BigDecimal newAmount) {
-        Account updated = new Account();
-        updated.setBank(previous.getBank());
-        updated.setCurrency(previous.getCurrency());
-        updated.setUser(previous.getUser());
-        Rate rate = previous.getRate();
-        updated.setRate(rate);
-        updated.setPreviousId(previous.getId());
-        updated.setVersion(previous.getVersion() + 1);
-        updated.setAmount(newAmount);
-        updated.setAmountChange(newAmount.subtract(previous.getAmount()));
-        BigDecimal newAmountBase = Objects.nonNull(rate)
-                ? newAmount.multiply(rate.getRate())
-                : newAmount;
-        updated.setAmountBase(newAmountBase);
-        updated.setAmountBaseChange(newAmountBase.subtract(previous.getAmountBase()));
-        updated.setUpdated(new Date());
-        return updated;
-    }
-
+    @Transactional
     public void updateAccountsRate(RateUpdate update) {
         Rate previousRate = rateRepository.findOne(update.getId());
         if (Objects.isNull(previousRate)) {
@@ -141,45 +120,16 @@ public class AccountService {
             log.error("No rate with id={}", update.getId());
             return;
         }
-        Rate rate = rateRepository.save(createRateUpdate(previousRate, update.getRate()));
+        Rate rate = rateRepository.save(previousRate.createRateUpdate(update.getRate()));
         List<Account> accountsToUpdate = accountRepository.findLatestAccountByRateId(update.getId());
         if (accountsToUpdate.isEmpty()) {
             log.warn("No accounts with rate id={}", update.getId());
             return;
         }
         List<Account> updatedAccounts = accountsToUpdate.stream()
-                .map(toUpdate -> {
-                    log.debug("Update account with id={} on rate={}", toUpdate.getId(), update.getRate());
-                    return createAccountRateUpdate(toUpdate, rate);
-                })
+                .peek(value -> log.debug("Update account with id={} on rate={}", value.getId(), update.getRate()))
+                .map(toUpdate -> toUpdate.createAccountRateUpdate(rate))
                 .collect(Collectors.toList());
         accountRepository.save(updatedAccounts);
-    }
-
-    private static Rate createRateUpdate(Rate previous, BigDecimal newRate) {
-        Rate updated = new Rate();
-        updated.setCurrency(previous.getCurrency());
-        updated.setRate(newRate);
-        updated.setUpdated(new Date());
-        updated.setVersion(previous.getVersion() + 1);
-        return updated;
-    }
-
-    private static Account createAccountRateUpdate(Account previous, Rate newRate) {
-        Account updated = new Account();
-        updated.setBank(previous.getBank());
-        updated.setCurrency(previous.getCurrency());
-        updated.setUser(previous.getUser());
-        updated.setRate(newRate);
-        updated.setPreviousId(previous.getId());
-        updated.setVersion(previous.getVersion() + 1);
-        BigDecimal amount = previous.getAmount();
-        updated.setAmount(amount);
-        updated.setAmountChange(previous.getAmountChange());
-        BigDecimal newAmountBase = amount.multiply(newRate.getRate());
-        updated.setAmountBase(newAmountBase);
-        updated.setAmountBaseChange(newAmountBase.subtract(previous.getAmountBase()));
-        updated.setUpdated(new Date());
-        return updated;
     }
 }

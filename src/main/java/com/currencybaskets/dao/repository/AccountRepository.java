@@ -38,5 +38,5 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
             "(SELECT MAX(a.id) from Account a " +
             "WHERE a.user.id IN ?1 AND a.updated <= ?2 " +
             "GROUP BY a.bank, a.currency.id, a.user.id)")
-    BigDecimal sumOfBaseAmountsForUserIdsLessThan(List<Long> userIds, Date date);
+    BigDecimal sumOfBaseAmountsForUserIdsOnDate(List<Long> userIds, Date date);
 }
