@@ -1,0 +1,9 @@
+# environment
+language: java
+jdk:
+  - oraclejdk8
+
+# build new commits only on master
+branches:
+  only:
+  - master
