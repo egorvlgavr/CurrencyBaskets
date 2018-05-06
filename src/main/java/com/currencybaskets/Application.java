@@ -24,9 +24,8 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    // TODO remove it after migration to prod data
-    @Profile("!test")
     @Bean
+    @Profile("dev")
     public CommandLineRunner demo(AccountRepository accountRepository,
                                   CurrencyRepository currencyRepository,
                                   UserRepository userRepository,
