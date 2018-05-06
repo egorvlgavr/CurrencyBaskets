@@ -35,9 +35,8 @@
             <span class="nav-link-text">Accounts</span>
           </a>
         </li>
-        <!--TODO implement-->
         <li class="nav-item" data-toggle="tooltip" data-placement="right" title="History">
-          <a class="nav-link" href="history.html">
+          <a class="nav-link" th:href="@{/history}">
             <i class="fa fa-fw fa-area-chart"></i>
             <span class="nav-link-text">History</span>
           </a>
@@ -135,10 +134,18 @@
                 <i class="fa fa-fw fa-money"></i>
               </div>
               <div class="mr-5">
-                <p>Total Amount</p>
-                <p th:text="'₽' + ${accountsWithRates.totalAmount}">...</p>
+                <p>
+                  Total Amount<br/>
+                  <span th:text="'₽' + ${accountsWithRates.totalAmount}">...</span>
+                </p>
               </div>
             </div>
+            <a class="card-footer text-white clearfix small z-1" th:href="@{/history}">
+              <span class="float-left">View Details</span>
+              <span class="float-right">
+                <i class="fa fa-angle-right"></i>
+              </span>
+            </a>
           </div>
           <!--Weekly changes-->
           <div class="card text-white o-hidden mb-1" th:classappend="${accountsWithRates.weekBaseAmountChange.background}">
@@ -147,17 +154,12 @@
                 <i class="fa fa-fw" th:classappend="${accountsWithRates.weekBaseAmountChange.icon}"></i>
               </div>
               <div class="mr-5">
-                <p>Week change</p>
-                <p th:text="'₽' + ${accountsWithRates.weekBaseAmountChange.change}">...</p>
+                <p>
+                  Week change<br/>
+                  <span th:text="'₽' + ${accountsWithRates.weekBaseAmountChange.change}">...</span>
+                </p>
               </div>
             </div>
-            <!--TODO proper href-->
-            <a class="card-footer text-white clearfix small z-1" href="#">
-              <span class="float-left">View Details</span>
-              <span class="float-right">
-                <i class="fa fa-angle-right"></i>
-              </span>
-            </a>
           </div>
           <!--Monthly changes-->
           <div class="card text-white o-hidden" th:classappend="${accountsWithRates.monthBaseAmountChange.background}">
@@ -166,17 +168,12 @@
                 <i class="fa fa-fw" th:classappend="${accountsWithRates.monthBaseAmountChange.icon}"></i>
               </div>
               <div class="mr-5">
-                <p>Month change</p>
-                <p th:text="'₽' + ${accountsWithRates.monthBaseAmountChange.change}">...</p>
+                <p>
+                  Month change<br/>
+                  <span th:text="'₽' + ${accountsWithRates.monthBaseAmountChange.change}">...</span>
+                </p>
               </div>
             </div>
-            <!--TODO proper href-->
-            <a class="card-footer text-white clearfix small z-1" href="#">
-              <span class="float-left">View Details</span>
-              <span class="float-right">
-                <i class="fa fa-angle-right"></i>
-              </span>
-            </a>
           </div>
         </div>
         <!-- Currency Pie Chart Card-->
@@ -210,7 +207,7 @@
               </div>
             </div>
             <div class="card-footer small text-muted">
-              <span th:text="*{accountsWithRates.latestRatesUpdated != null}? ('Updated ' +  ${#dates.format(accountsWithRates.latestRatesUpdated, 'dd-MM-yyyy HH:mm')}) :'(no rates specified)'">
+              <span th:text="*{accountsWithRates.latestRatesUpdated != null}? ('Updated ' +  ${#dates.format(accountsWithRates.latestRatesUpdated, 'dd-MM-yyyy')}) :'(no rates specified)'">
                 Updated ...
               </span>
             </div>
