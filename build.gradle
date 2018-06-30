@@ -8,7 +8,7 @@ buildscript {
 }
 
 plugins {
-    id 'net.nemerosa.versioning' version '2.0.0'
+    id 'net.nemerosa.versioning' version '2.7.1'
 }
 
 apply plugin: 'java'
@@ -17,8 +17,14 @@ apply plugin: 'org.springframework.boot'
 
 jar {
     baseName = 'currency-baskets'
-    version =  '0.1.0'
+    version = versioning.info.lastTag + versioning.info.full
 }
+
+versionFile {
+    file = new File(sourceSets.main.output.resourcesDir, 'version.properties')
+}
+
+processResources.dependsOn(versionFile)
 
 repositories {
     mavenCentral()
