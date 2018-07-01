@@ -55,6 +55,10 @@ public class Application {
             currency1.setName("EUR");
             currencyRepository.save(currency1);
 
+            Currency currency2 = new Currency();
+            currency2.setName("RUB");
+            currencyRepository.save(currency2);
+
             ZonedDateTime now = ZonedDateTime.now();
             Date monthAgo = Date.from(now.minusMonths(1).toInstant());
             Date weekAgo = Date.from(now.minusWeeks(1).toInstant());
@@ -136,6 +140,17 @@ public class Application {
             account4.setCurrency(currency1);
             account4.setRate(rate1);
             accountRepository.save(account4);
+
+            Account account5 = new Account();
+            account5.setAmount(new BigDecimal(1451.8));
+            account5.setBank("Tinkoff");
+            account5.setAmountBase(new BigDecimal(1451.8));
+            account5.setUpdated(new Date());
+            account5.setPreviousId(1L);
+            account5.setVersion(1);
+            account5.setUser(usr2);
+            account5.setCurrency(currency2);
+            accountRepository.save(account5);
         });
     }
 }

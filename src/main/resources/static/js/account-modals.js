@@ -13,6 +13,13 @@ function showAccountModal(id) {
   var accountAmountBase = $('#accountAmountBase' + id).text();
   $('#accountModalAmountBase').text(accountAmountBase);
 
+  var accountRate = $('#accountRate' + id).text();
+  $('#accountModalRate').text(accountRate);
+  var rateFloat = parseFloat(accountRate);
+  if (isNaN(rateFloat) || rateFloat == 1.0) {
+    $('#accountModalRateInput').hide();
+  }
+
   // show modal
   $('#accountModal').modal('show');
 }
@@ -27,4 +34,12 @@ function showRateModal(id) {
     $('#rateModalRate').val(rate);
     // show modal
     $('#rateModal').modal('show');
+}
+
+function modalUpdateBaseAmount() {
+    var accountAmount = parseFloat($('#accountModalAmount').val());
+    var rate = parseFloat($('#accountModalRate').text());
+    if(!isNaN(accountAmount) && !isNaN(rate)) {
+       $('#accountModalAmountBase').text(Math.round(accountAmount * rate * 100) / 100);
+    }
 }

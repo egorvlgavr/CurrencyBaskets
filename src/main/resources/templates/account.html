@@ -231,6 +231,7 @@
                 <th>Amount in Rubles</th>
                 <th>Updated</th>
                 <th></th>
+                <th style="display:none;">Rate</th>
               </tr>
               </thead>
               <tbody>
@@ -244,6 +245,7 @@
                   <td th:id="'accountAmountBase' + ${account.id}" th:text="${account.amountBase}">...</td>
                   <td th:text="${account.updated}">...</td>
                   <td><i class="fa fa-pencil fa-fw" th:onclick="'showAccountModal(' + ${account.id} + ')'"></i></td>
+                  <td style="display:none;" th:id="'accountRate' + ${account.id}" th:text="${account.rate}">...</td>
                 </tr>
               </th:block>
               </tbody>
@@ -290,13 +292,21 @@
                   <p id="accountModalCurrency" class="form-control-static">USD</p>
                 </div>
               </div>
-              <div class="form-group">
-                <label>New amount</label>
-                <input id="accountModalAmount" class="form-control" placeholder="New amount value" th:field="*{amount}"/>
+              <div id="accountModalRateInput" class="form-group row">
+                <div class="col-sm-2">
+                  <label>Rate:</label>
+                </div>
+                <div class="col-sm-10">
+                  <p id="accountModalRate" class="form-control-static">76.2</p>
+                </div>
               </div>
               <div class="form-group">
-                <label>New amount in Rubles</label>
-                <!--TODO set in on fly with jQuery-->
+                <label>New amount</label>
+                <input id="accountModalAmount" class="form-control" placeholder="New amount value"
+                       onchange="modalUpdateBaseAmount()" th:field="*{amount}"/>
+              </div>
+              <div class="form-group">
+                <label>New amount Base</label>
                 <p id="accountModalAmountBase" class="form-control-static">12,456</p>
               </div>
             </form>

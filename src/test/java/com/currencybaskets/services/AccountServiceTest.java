@@ -22,6 +22,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -75,6 +77,13 @@ public class AccountServiceTest {
                         .map(AccountView::getUserFullName)
                         .allMatch("n1 sn1"::equals)
         );
+
+        assertAccountViewRates(
+                actual.getAccounts()
+                        .stream()
+                        .map(AccountView::getRate)
+                        .collect(Collectors.toList())
+        );
         assertThat(actual.getTotalAmount(),  Matchers.comparesEqualTo(new BigDecimal(1111)));
 
         assertThat(actual.getWeekBaseAmountChange().getChange(),  Matchers.comparesEqualTo(new BigDecimal(111)));
@@ -126,6 +135,14 @@ public class AccountServiceTest {
         account.setUser(user);
         account.setAmountBase(new BigDecimal(baseAmount));
         return account;
+    }
+
+    private static void assertAccountViewRates(List<BigDecimal> rates) {
+        assertThat(rates.size(), is(4));
+        assertTrue(Stream.of(rates.get(0), rates.get(2), rates.get(3))
+                .allMatch(rate -> isEqualWithDelta(rate, 7.31))
+        );
+        assertThat(rates.get(1), Matchers.comparesEqualTo(BigDecimal.ONE));
     }
 
     @Test
