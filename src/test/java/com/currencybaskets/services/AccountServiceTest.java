@@ -206,6 +206,8 @@ public class AccountServiceTest {
                 Account account = iterator.next();
                 return account.getVersion().equals(2)
                         && account.getRate().getRate().equals(newRate)
+                        && isEqualWithDelta(account.getAmount(), 20)
+                        && isEqualWithDelta(account.getAmountChange(), 0)
                         && isEqualWithDelta(account.getAmountBase(), 44)
                         && isEqualWithDelta(account.getAmountBaseChange(), -102.2);
             }

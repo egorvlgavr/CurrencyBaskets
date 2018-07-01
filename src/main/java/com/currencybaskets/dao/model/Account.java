@@ -84,7 +84,7 @@ public class Account {
         updated.setPreviousId(id);
         updated.setVersion(version + 1);
         updated.setAmount(amount);
-        updated.setAmountChange(amountChange);
+        updated.setAmountChange(BigDecimal.ZERO);
         BigDecimal newAmountBase = amount.multiply(newRate.getRate());
         updated.setAmountBase(newAmountBase);
         updated.setAmountBaseChange(newAmountBase.subtract(amountBase));
