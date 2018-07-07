@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class AccountController {
 
     // TODO use spring security
-    private static final long USER_ID_FIXTURE = 1L;
+    static final long USER_ID_FIXTURE = 1L;
 
     @Autowired
     private AccountService accountService;

@@ -39,4 +39,8 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
             "WHERE a.user.id IN ?1 AND a.updated <= ?2 " +
             "GROUP BY a.bank, a.currency.id, a.user.id)")
     BigDecimal sumOfBaseAmountsForUserIdsOnDate(List<Long> userIds, Date date);
+
+    @Query("SELECT a FROM Account a " +
+            "WHERE a.user.id IN ?1 AND a.updated > ?2")
+    List<Account> findAccountsForUserIdsAfterDate(List<Long> userIds, Date date);
 }

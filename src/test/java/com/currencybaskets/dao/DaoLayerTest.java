@@ -30,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 @TestPropertySource(properties = "spring.jpa.hibernate.ddl-auto:create-drop")
 public class DaoLayerTest {
 
+    private static final BigDecimal R1_RATE = new BigDecimal(42);
     private static final BigDecimal R2_RATE = new BigDecimal(43);
     private static final String C1_NAME = "C1";
     private static final String C2_NAME = "C2";
@@ -88,7 +89,7 @@ public class DaoLayerTest {
         Rate r1 = new Rate();
         r1.setCurrency(c1);
         r1.setVersion(0);
-        r1.setRate(new BigDecimal(42));
+        r1.setRate(R1_RATE);
         r1.setUpdated(new Date());
         entityManager.persist(r1);
 
@@ -150,13 +151,7 @@ public class DaoLayerTest {
         List<Account> latestAccountByUserId = accountRepository.findLatestAccountByUserIds(userIds());
         assertEquals(latestAccountByUserId.size(), 5);
         // in pair only second rate should be returned by query because it used in latest versions
-        assertTrue(
-                latestAccountByUserId
-                        .stream()
-                        .map(Account::getRate)
-                        .map(Rate::getRate)
-                        .allMatch(R2_RATE::equals)
-        );
+        assertByR2Rate(latestAccountByUserId);
     }
 
     @Test
@@ -207,4 +202,21 @@ public class DaoLayerTest {
         assertTrue(Objects.isNull(nullSum));
     }
 
+    @Test
+    public void testFindAccountsForUserIdsAfterDate() throws Exception {
+        Date monthAgo = Date.from(NOW.minusMonths(1).toInstant());
+        List<Account> result = accountRepository.findAccountsForUserIdsAfterDate(userIds(), monthAgo);
+        assertEquals(result.size(), 6);
+        assertByR2Rate(result);
+    }
+
+    private static void assertByR2Rate(List<Account> result) {
+        assertTrue(
+                result
+                        .stream()
+                        .map(Account::getRate)
+                        .map(Rate::getRate)
+                        .allMatch(R2_RATE::equals)
+        );
+    }
 }

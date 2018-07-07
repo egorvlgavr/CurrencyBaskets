@@ -122,7 +122,6 @@
         </li>
         <li class="breadcrumb-item active">History</li>
       </ol>
-      <h3>Work in progress!!!</h3>
       <!--Plots-->
       <!--TODO draw all plots-->
       <!-- Area Chart-->
@@ -130,9 +129,23 @@
         <div class="card-header">
           <i class="fa fa-area-chart"></i> Total amount</div>
         <div class="card-body">
-          <canvas id="myAreaChart" width="100%" height="30"></canvas>
+          <ul class="nav nav-pills">
+            <li class="nav-item">
+              <a class="nav-link active" data-toggle="pill" onclick="drawAmountHistoryLineChartYear()" href="#">Year</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="pill" onclick="drawAmountHistoryLineChartMonth()" href="#">Month</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="pill" onclick="drawAmountHistoryLineChartWeek()" href="#">Week</a>
+            </li>
+          </ul>
+            <div class="row mt-3">
+                <canvas id="historyAmount" width="100%" height="30"></canvas>
+            </div>
+
         </div>
-        <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+        <div id="amountHistoryFooter" class="card-footer small text-muted">Updated ...</div>
       </div>
     </div>
     <!-- /.container-fluid-->
