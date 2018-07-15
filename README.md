@@ -1,6 +1,6 @@
 Currency Baskets
 --------------- 
-[![Build Status](https://travis-ci.org/egorvlgavr/CurrencyBaskets.svg?branch=master)](https://travis-ci.org/egorvlgavr/CurrencyBaskets)
+[![Build Status](https://travis-ci.org/egorvlgavr/currency-baskets.svg?branch=master)](https://travis-ci.org/egorvlgavr/currency-baskets)
 
 Old good monolithic spring boot application that store and visualize information about several account with different currencies that stored in different banks.
 Store all history of account changes in *incremental* way to give ability to view all amount changes or currency rate changes.  
