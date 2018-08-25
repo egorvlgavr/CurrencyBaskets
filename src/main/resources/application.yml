@@ -14,3 +14,8 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: create-drop
+---
+spring:
+  profiles: docker
+  datasource:
+    url: jdbc:postgresql://postgresql:5432/currencybaskets

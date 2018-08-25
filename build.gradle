@@ -4,6 +4,7 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.9.RELEASE")
+        classpath('gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.13.0')
     }
 }
 
@@ -14,6 +15,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'com.palantir.docker'
 
 jar {
     baseName = 'currency-baskets'
@@ -41,4 +43,11 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.16.18")
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("com.h2database:h2:1.4.194")
+}
+
+docker {
+    dependsOn build
+    name "${jar.baseName}"
+    files jar.archivePath
+    buildArgs(['JAR_FILE': "${jar.archiveName}"])
 }
