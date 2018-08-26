@@ -12,4 +12,5 @@ PostgreSQL [database model](https://repository.genmymodel.com/egorvlgavr/Currenc
 4. CICD: **Docker**, **Travis CI**
 ### Docker description
 Contains:  
-1. PostgreSQL 9.4 image based on Alpine Linux
+1. PostgreSQL 9.6 image based on Alpine Linux
+2. Dockerized **Currency Baskets** application image based on Alpine Linux
