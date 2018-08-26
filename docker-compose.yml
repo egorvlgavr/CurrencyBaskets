@@ -5,7 +5,13 @@ services:
     ports:
       # We'll bind our host's port 5432 to postgres's port 5432, so we can use
       # our database IDEs with it:
-      - 5432:5432
+      - "5432:5432"
     environment:
           POSTGRES_PASSWORD: admin
           POSTGRES_DB: currencybaskets
+  currency-baskets:
+    depends_on:
+       - "postgresql"
+    image: "currency-baskets:latest"
+    ports:
+      - "8080:8080"
