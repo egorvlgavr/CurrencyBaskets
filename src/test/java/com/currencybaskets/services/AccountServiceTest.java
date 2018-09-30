@@ -7,6 +7,7 @@ import com.currencybaskets.dao.model.User;
 import com.currencybaskets.dao.repository.AccountRepository;
 import com.currencybaskets.dao.repository.RateRepository;
 import com.currencybaskets.dto.AccountUpdate;
+import com.currencybaskets.dto.AmountHistoryDto;
 import com.currencybaskets.view.AccountView;
 import com.currencybaskets.view.LatestAccountsView;
 import com.currencybaskets.view.RateUpdate;
@@ -40,6 +41,7 @@ public class AccountServiceTest {
 
     private static Date LATEST_DATE = new GregorianCalendar(2017, Calendar.FEBRUARY, 11).getTime();
     private static Date NOT_LATEST_DATE = new GregorianCalendar(2017, Calendar.JANUARY, 11).getTime();
+    private static Date NOT_NOT_LATEST_DATE = new GregorianCalendar(2016, Calendar.JANUARY, 11).getTime();
 
     @TestConfiguration
     static class AccountServiceTestConfiguration {
@@ -238,5 +240,45 @@ public class AccountServiceTest {
 
     private static boolean isEqualWithDelta(BigDecimal expected, double actual) {
        return expected.subtract(new BigDecimal(actual)).abs().floatValue() <= 0.1;
+    }
+
+    @Test
+    public void getAggregatedAmountHistory() throws Exception {
+        when(repository.sumOfBaseAmountsForUserIdsOnDate(any(), any())).thenReturn(new BigDecimal(500));
+        when(repository.findAccountsForUserIdsAfterDate(any(), any())).thenReturn(updates());
+        List<AmountHistoryDto> result = service.getAggregatedAmountHistory(Collections.singletonList(1L), NOT_NOT_LATEST_DATE);
+        assertThat(result.size(), is(3));
+        assertAmountHistory(result.get(0), 500.0, NOT_NOT_LATEST_DATE);
+        assertAmountHistory(result.get(1), 1480.0, NOT_LATEST_DATE);
+        assertAmountHistory(result.get(2), 1530.0, LATEST_DATE);
+
+    }
+
+    private static List<Account> updates() {
+        Rate rate = rate(NOT_LATEST_DATE);
+        Currency cur = rate.getCurrency();
+        User usr = new User();
+        usr.setName("n1");
+        usr.setSurname("sn1");
+        return Arrays.asList(
+                update(usr, cur, rate, 1000, NOT_LATEST_DATE),
+                update(usr, cur, rate, -20, NOT_LATEST_DATE),
+                update(usr, cur, rate, 50, LATEST_DATE)
+        );
+    }
+
+    private static Account update(User user, Currency currency, Rate rate, int amountChange, Date date) {
+        Account account = new Account();
+        account.setCurrency(currency);
+        account.setRate(rate);
+        account.setUser(user);
+        account.setAmountBaseChange(new BigDecimal(amountChange));
+        account.setUpdated(date);
+        return account;
+    }
+
+    private static void assertAmountHistory(AmountHistoryDto subject, double amount, Date date) {
+        assertThat(subject.getLabel(), is(AmountHistoryDto.LABEL_DATE_FORMATTER.format(date)));
+        assertTrue(isEqualWithDelta(subject.getAmount(), amount));
     }
 }

@@ -6,6 +6,7 @@ import com.currencybaskets.dto.fixer.LatestRate;
 import com.currencybaskets.exceptions.ServiceUnavailableException;
 import com.currencybaskets.services.AccountService;
 import com.currencybaskets.services.CurrencyFixerClient;
+import com.currencybaskets.util.Constants;
 import com.currencybaskets.view.RateUpdate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +37,9 @@ public class UpdateLatestRateScheduledTask {
 			throw new ServiceUnavailableException("Fixer service is not available");
 		}
 		LatestRate rates = currencyRate.getLatestRate();
-		Long previousRateEurId = rateRepository.findLatestRateIdByCurrencyName("EUR");
+		Long previousRateEurId = rateRepository.findLatestRateIdByCurrencyName(Constants.EUR);
 		log.info("EUR rate with id={} will be updated", previousRateEurId);
-		Long previousRateUsdId = rateRepository.findLatestRateIdByCurrencyName("USD");
+		Long previousRateUsdId = rateRepository.findLatestRateIdByCurrencyName(Constants.USD);
 		log.info("USD rate with id={} will be updated", previousRateUsdId);
 		List<RateUpdate> updates = Arrays.asList(
 				new RateUpdate(previousRateEurId, rates.getEurInRub()),
