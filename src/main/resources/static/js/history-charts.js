@@ -12,6 +12,8 @@ function drawAmountHistoryLineChart(fromParam) {
         });
         var maxYAxis = Math.max.apply(Math,data) * 1.2;
 
+        $("canvas#historyAmount").remove();
+        $("#historyAmountHolder").append('<canvas id="historyAmount" width="100%" height="30"></canvas>');
         var ctx = document.getElementById("historyAmount");
         var historyAmountLineChart = new Chart(ctx, {
           type: 'line',
