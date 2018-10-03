@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import static com.currencybaskets.api.AccountController.USER_ID_FIXTURE;
 
@@ -33,7 +34,11 @@ public class HistoryController {
     @ResponseBody
     public List<AmountHistoryDto> getAmountHistory(@RequestParam("from")String from) {
         List<Long> ids = userRepository.getUserIdsInSameGroup(USER_ID_FIXTURE);
-        return accountService.getAggregatedAmountHistory(ids, parseDateFromParam(from));
+        Date date = parseDateFromParam(from);
+        if (Objects.isNull(date)) {
+            return accountService.getAggregatedAmountHistory(ids);
+        }
+        return accountService.getAggregatedAmountHistory(ids, date);
     }
 
     private static Date parseDateFromParam(String from) {
@@ -45,8 +50,10 @@ public class HistoryController {
                 return Date.from(now.minusMonths(1).toInstant());
             case "week":
                 return Date.from(now.minusWeeks(1).toInstant());
+            case "all":
+                return null;
             default:
-                throw new IllegalArgumentException("Param should be [year, month, week] but was:" + from);
+                throw new IllegalArgumentException("Param should be [year, month, week, all] but was:" + from);
         }
     }
 }

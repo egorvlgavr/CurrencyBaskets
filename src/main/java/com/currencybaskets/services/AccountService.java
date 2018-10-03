@@ -139,12 +139,13 @@ public class AccountService {
 
     @Transactional
     public List<AmountHistoryDto> getAggregatedAmountHistory(List<Long> userIds, Date from) {
-        BigDecimal aggregatedAmount = accountRepository.sumOfBaseAmountsForUserIdsOnDate(userIds, from);
-        if (Objects.isNull(aggregatedAmount)) {
-            aggregatedAmount = BigDecimal.ZERO;
-        }
         List<AmountHistoryDto> result = new ArrayList<>();
-        result.add(new AmountHistoryDto(from, aggregatedAmount));
+        BigDecimal aggregatedAmount = accountRepository.sumOfBaseAmountsForUserIdsOnDate(userIds, from);
+        if (Objects.nonNull(aggregatedAmount)) {
+            result.add(new AmountHistoryDto(from, aggregatedAmount));
+        } else {
+          aggregatedAmount = BigDecimal.ZERO;
+        }
 
         List<Account> updates = accountRepository.findAccountsForUserIdsAfterDate(userIds, from);
         TreeMap<Date, List<Account>> groupedByDateAccounts = updates.stream()
@@ -154,6 +155,19 @@ public class AccountService {
             result.add(new AmountHistoryDto(dateToAccounts.getKey(), aggregatedAmount));
         }
         return result;
+    }
+
+    public List<AmountHistoryDto> getAggregatedAmountHistory(List<Long> userIds) {
+      List<AmountHistoryDto> result = new ArrayList<>();
+      List<Account> updates = accountRepository.findByUserIdIn(userIds);
+      TreeMap<Date, List<Account>> groupedByDateAccounts = updates.stream()
+          .collect(groupingBy(Account::getUpdated, TreeMap::new, toList()));
+      BigDecimal aggregatedAmount = BigDecimal.ZERO;
+      for (Map.Entry<Date, List<Account>> dateToAccounts : groupedByDateAccounts.entrySet()) {
+        aggregatedAmount = aggregatedAmount.add(calculateAggregatedAmountChanges(dateToAccounts.getValue()));
+        result.add(new AmountHistoryDto(dateToAccounts.getKey(), aggregatedAmount));
+      }
+      return result;
     }
 
     private static BigDecimal calculateAggregatedAmountChanges(Collection<Account> accounts) {

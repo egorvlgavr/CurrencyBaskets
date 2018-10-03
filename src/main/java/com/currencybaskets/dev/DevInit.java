@@ -80,7 +80,7 @@ public class DevInit implements CommandLineRunner {
     Account raif_eur1 = account(30.0, eur_rate1, raiffeisen, usr2, sixMonthAgo);
 
 
-    // 45 days ago: 1 rate update + 1 new account
+    // 25 days ago: 1 rate update + 1 new account
     Account alfa_rub = account(1800.0, rub, alfa, usr1, twentyFiveDaysAgo);
     Rate usd_rate2 = updateRate(55.0, usd_rate1, twentyFiveDaysAgo);
     Account raif_usd2 = updateAccountOnRate(raif_usd1, usd_rate2, twentyFiveDaysAgo);

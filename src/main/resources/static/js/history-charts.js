@@ -82,6 +82,10 @@ function drawAmountHistoryLineChartWeek() {
     drawAmountHistoryLineChart('week')
 }
 
+function drawAmountHistoryLineChartAll() {
+    drawAmountHistoryLineChart('all')
+}
+
 // this is called because year chart is active by default
 $(function() {
     drawAmountHistoryLineChartYear()

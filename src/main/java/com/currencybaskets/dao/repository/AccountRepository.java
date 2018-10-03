@@ -43,4 +43,6 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
     @Query("SELECT a FROM Account a " +
             "WHERE a.user.id IN ?1 AND a.updated > ?2")
     List<Account> findAccountsForUserIdsAfterDate(List<Long> userIds, Date date);
+
+    List<Account> findByUserIdIn(List<Long> ids);
 }
