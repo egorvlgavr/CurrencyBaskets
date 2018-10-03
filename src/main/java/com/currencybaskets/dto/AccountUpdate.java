@@ -7,5 +7,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AccountUpdate {
     private long id;
-    private int amount;
+    private double amount;
 }

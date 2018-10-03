@@ -109,7 +109,7 @@ public class AccountService {
         if (previous != null) {
             Account incrementalUpdate = previous.createAccountAmountUpdate(new BigDecimal(update.getAmount()));
             accountRepository.save(incrementalUpdate);
-            log.debug("Update account with id={} on amount={}", previous.getId(), update.getAmount());
+            log.info("Update account with id={} on amount={}", previous.getId(), update.getAmount());
         } else {
             // TODO throw exception and handle it properly
             log.error("Not found account for id={}", update.getId());
@@ -131,7 +131,7 @@ public class AccountService {
             return;
         }
         List<Account> updatedAccounts = accountsToUpdate.stream()
-                .peek(value -> log.debug("Update account with id={} on rate={}", value.getId(), update.getRate()))
+                .peek(value -> log.info("Update account with id={} on rate={}", value.getId(), update.getRate()))
                 .map(toUpdate -> toUpdate.createAccountRateUpdate(rate))
                 .collect(toList());
         accountRepository.save(updatedAccounts);

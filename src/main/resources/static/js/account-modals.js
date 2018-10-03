@@ -2,7 +2,6 @@
 function showAccountModal(id) {
   // build modal form with proper data
   var accountId = $('#accountId' + id).text();
-  $('#accountModalId').text(accountId);
   $('#accountModalHiddenId').val(accountId);
   var accountBank = $('#accountBank' + id).text();
   $('#accountModalBank').text(accountBank);
@@ -26,7 +25,6 @@ function showAccountModal(id) {
 
 function showRateModal(id) {
     // build modal form with proper data
-    $('#rateModalId').text(id);
     $('#rateModalHiddenId').val(id);
     var currency = $('#rateCurrency' + id).text();
     $('#rateModalCurrency').text(currency);

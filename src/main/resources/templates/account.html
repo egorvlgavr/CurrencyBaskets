@@ -223,7 +223,7 @@
             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
               <thead>
               <tr>
-                <th>Id</th>
+                <th style="display:none;">Id</th>
                 <th>User</th>
                 <th>Bank</th>
                 <th>Currency</th>
@@ -237,7 +237,7 @@
               <tbody>
               <th:block th:each="account : ${accountsWithRates.accounts}">
                 <tr>
-                  <td th:id="'accountId' + ${account.id}" th:text="${account.id}">...</td>
+                  <td style="display:none;" th:id="'accountId' + ${account.id}" th:text="${account.id}">...</td>
                   <td th:id="'accountUserName' + ${account.id}" th:text="${account.userFullName}">...</td>
                   <td th:id="'accountBank' + ${account.id}" th:text="${account.bank}">...</td>
                   <td th:id="'accountCurrency' + ${account.id}" th:text="${account.currency}">...</td>
@@ -268,13 +268,7 @@
           <div class="modal-body">
             <form action="#" th:action="@{/updateAccount}" th:object="${accountUpdate}" method="post" id="accountUpdateForm">
               <div class="form-group row">
-                <div class="col-sm-2">
-                  <label>Id:</label>
-                </div>
-                <div class="col-sm-10">
                   <input type="hidden" id="accountModalHiddenId" th:field="*{id}"/>
-                  <p id="accountModalId" class="form-control-static">789</p>
-                </div>
               </div>
               <div class="form-group row">
                 <div class="col-sm-2">
@@ -329,13 +323,7 @@
           <div class="modal-body">
             <form action="#" th:action="@{/updateRate}" th:object="${rateUpdate}" method="post" id="rateUpdateForm">
               <div class="form-group row">
-                <div class="col-sm-2">
-                  <label>Id:</label>
-                </div>
-                <div class="col-sm-10">
-                  <input type="hidden" id="rateModalHiddenId" th:field="*{id}"/>
-                  <p id="rateModalId" class="form-control-static">789</p>
-                </div>
+                <input type="hidden" id="rateModalHiddenId" th:field="*{id}"/>
               </div>
               <div class="form-group row">
                 <div class="col-sm-2">
