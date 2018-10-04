@@ -7,7 +7,7 @@ import com.currencybaskets.dao.model.User;
 import com.currencybaskets.dao.repository.AccountRepository;
 import com.currencybaskets.dao.repository.RateRepository;
 import com.currencybaskets.dto.AccountUpdate;
-import com.currencybaskets.dto.AmountHistoryDto;
+import com.currencybaskets.dto.HistoryDto;
 import com.currencybaskets.view.AccountView;
 import com.currencybaskets.view.LatestAccountsView;
 import com.currencybaskets.view.RateUpdate;
@@ -39,9 +39,9 @@ public class AccountServiceTest {
 
     private static final String CURRENCY_NAME = "test_currency";
 
-    private static Date LATEST_DATE = new GregorianCalendar(2017, Calendar.FEBRUARY, 11).getTime();
-    private static Date NOT_LATEST_DATE = new GregorianCalendar(2017, Calendar.JANUARY, 11).getTime();
-    private static Date NOT_NOT_LATEST_DATE = new GregorianCalendar(2016, Calendar.JANUARY, 11).getTime();
+    static Date LATEST_DATE = new GregorianCalendar(2017, Calendar.FEBRUARY, 11).getTime();
+    static Date NOT_LATEST_DATE = new GregorianCalendar(2017, Calendar.JANUARY, 11).getTime();
+    static Date NOT_NOT_LATEST_DATE = new GregorianCalendar(2016, Calendar.JANUARY, 11).getTime();
 
     @TestConfiguration
     static class AccountServiceTestConfiguration {
@@ -246,11 +246,11 @@ public class AccountServiceTest {
     public void getAggregatedAmountHistory() throws Exception {
         when(repository.sumOfBaseAmountsForUserIdsOnDate(any(), any())).thenReturn(new BigDecimal(500));
         when(repository.findAccountsForUserIdsAfterDate(any(), any())).thenReturn(updates());
-        List<AmountHistoryDto> result = service.getAggregatedAmountHistory(Collections.singletonList(1L), NOT_NOT_LATEST_DATE);
+        List<HistoryDto> result = service.getAggregatedAmountHistory(Collections.singletonList(1L), NOT_NOT_LATEST_DATE);
         assertThat(result.size(), is(3));
-        assertAmountHistory(result.get(0), 500.0, NOT_NOT_LATEST_DATE);
-        assertAmountHistory(result.get(1), 1480.0, NOT_LATEST_DATE);
-        assertAmountHistory(result.get(2), 1530.0, LATEST_DATE);
+        assertHistory(result.get(0), 500.0, NOT_NOT_LATEST_DATE);
+        assertHistory(result.get(1), 1480.0, NOT_LATEST_DATE);
+        assertHistory(result.get(2), 1530.0, LATEST_DATE);
 
     }
 
@@ -277,8 +277,8 @@ public class AccountServiceTest {
         return account;
     }
 
-    private static void assertAmountHistory(AmountHistoryDto subject, double amount, Date date) {
-        assertThat(subject.getLabel(), is(AmountHistoryDto.LABEL_DATE_FORMATTER.format(date)));
+    static void assertHistory(HistoryDto subject, double amount, Date date) {
+        assertThat(subject.getLabel(), is(HistoryDto.LABEL_DATE_FORMATTER.format(date)));
         assertTrue(isEqualWithDelta(subject.getAmount(), amount));
     }
 }

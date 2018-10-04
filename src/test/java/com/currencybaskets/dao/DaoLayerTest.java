@@ -2,6 +2,7 @@ package com.currencybaskets.dao;
 
 import com.currencybaskets.dao.model.*;
 import com.currencybaskets.dao.repository.AccountRepository;
+import com.currencybaskets.dao.repository.RateRepository;
 import com.currencybaskets.dao.repository.UserRepository;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -52,6 +53,9 @@ public class DaoLayerTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RateRepository rateRepository;
+
     @Before
     public void createAccountsForAggregations() throws Exception {
         // Create user
@@ -85,28 +89,38 @@ public class DaoLayerTest {
         c2.setName(C2_NAME);
         entityManager.persist(c2);
 
+
+        Date monthAgo = Date.from(NOW.minusMonths(1).toInstant());
+        Date weekAgo = Date.from(NOW.minusWeeks(1).toInstant());
+        Date weekAndDay = Date.from(NOW.minusWeeks(1).minusDays(1).toInstant());
+
         // Create rate
+
+        Rate r3 = new Rate();
+        r3.setCurrency(c1);
+        r3.setVersion(0);
+        r3.setRate(new BigDecimal(44));
+        r3.setUpdated(monthAgo);
+        entityManager.persist(r3);
+
         Rate r1 = new Rate();
         r1.setCurrency(c1);
         r1.setVersion(0);
         r1.setRate(R1_RATE);
-        r1.setUpdated(new Date());
+        r1.setUpdated(weekAndDay);
         entityManager.persist(r1);
 
         Rate r2 = new Rate();
         r2.setCurrency(c1);
         r2.setVersion(0);
         r2.setRate(R2_RATE);
-        r2.setUpdated(new Date());
+        r2.setUpdated(Date.from(NOW.toInstant()));
         rate2Id = entityManager.persistAndGetId(r2, Long.class);
+
+
 
         String b1 = "b1";
         String b2 = "b2";
-
-
-        Date monthAgo = Date.from(NOW.minusMonths(1).toInstant());
-        Date weekAgo = Date.from(NOW.minusWeeks(1).toInstant());
-        Date weekAndDay = Date.from(NOW.minusWeeks(1).minusDays(1).toInstant());
 
         createAndPersistAccount(c1, b1, r1, usr1, monthAgo, AMOUNT_BASE_PREVIOUS);
         createAndPersistAccount(c1, b1, r2, usr1, weekAndDay, AMOUNT_BASE_PREVIOUS);
@@ -218,5 +232,21 @@ public class DaoLayerTest {
                         .map(Rate::getRate)
                         .allMatch(R2_RATE::equals)
         );
+    }
+
+    @Test
+    public void testFindRatesOnDate() throws Exception {
+      Date weekAgo = Date.from(NOW.minusWeeks(1).toInstant());
+      List<Rate> result = rateRepository.findRatesOnDate(weekAgo);
+      assertEquals(result.size(), 1);
+      assertEquals(result.get(0).getRate(), R1_RATE);
+    }
+
+    @Test
+    public void testFindRatesAfterDate() throws Exception {
+      Date weekAgo = Date.from(NOW.minusWeeks(1).toInstant());
+      List<Rate> result = rateRepository.findRatesAfterDate(weekAgo);
+      assertEquals(result.size(), 1);
+      assertEquals(result.get(0).getRate(), R2_RATE);
     }
 }

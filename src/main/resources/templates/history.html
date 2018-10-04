@@ -125,31 +125,60 @@
       <!--Plots-->
       <!--TODO draw all plots-->
       <!-- Area Chart-->
-      <div class="card mb-3">
-        <div class="card-header">
-          <i class="fa fa-area-chart"></i> Total amount</div>
-        <div class="card-body">
-          <ul class="nav nav-pills">
-            <li class="nav-item">
-              <a class="nav-link active" data-toggle="pill" onclick="drawAmountHistoryLineChartYear()" href="#">Year</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="pill" onclick="drawAmountHistoryLineChartMonth()" href="#">Month</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="pill" onclick="drawAmountHistoryLineChartWeek()" href="#">Week</a>
-            </li>
-              <li class="nav-item">
-                  <a class="nav-link" data-toggle="pill" onclick="drawAmountHistoryLineChartAll()" href="#">All time</a>
-              </li>
-          </ul>
-            <div id="historyAmountHolder" class="row mt-3">
-                <canvas id="historyAmount" width="100%" height="30"></canvas>
+      <div class="row">
+            <div class="col">
+                <div class="card mb-3">
+                    <div class="card-header"><i class="fa fa-area-chart"></i> Total amount</div>
+                    <div class="card-body">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item">
+                              <a class="nav-link active" data-toggle="pill" onclick="drawAmountHistoryLineChartYear()" href="#">Year</a>
+                            </li>
+                            <li class="nav-item">
+                              <a class="nav-link" data-toggle="pill" onclick="drawAmountHistoryLineChartMonth()" href="#">Month</a>
+                            </li>
+                            <li class="nav-item">
+                              <a class="nav-link" data-toggle="pill" onclick="drawAmountHistoryLineChartWeek()" href="#">Week</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="pill" onclick="drawAmountHistoryLineChartAll()" href="#">All time</a>
+                            </li>
+                        </ul>
+                        <div id="historyAmountHolder" class="row mt-3">
+                            <canvas id="historyAmount" width="100%" height="30"></canvas>
+                        </div>
+                    </div>
+                        <div id="amountHistoryFooter" class="card-footer small text-muted">Updated ...</div>
+                </div>
             </div>
+            <div class="col">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <i class="fa fa-area-chart"></i> Rates</div>
+                    <div class="card-body">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="pill" onclick="drawRatesHistoryLineChartYear()" href="#">Year</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="pill" onclick="drawRatesHistoryLineChartMonth()" href="#">Month</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="pill" onclick="drawRatesHistoryLineChartWeek()" href="#">Week</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="pill" onclick="drawRatesHistoryLineChartAll()" href="#">All time</a>
+                            </li>
+                        </ul>
+                        <div id="historyRateHolder" class="row mt-3">
+                            <canvas id="historyRates" width="100%" height="30"></canvas>
+                        </div>
 
+                    </div>
+                    <div id="ratesHistoryFooter" class="card-footer small text-muted">Updated ...</div>
+                </div>
+            </div>
         </div>
-        <div id="amountHistoryFooter" class="card-footer small text-muted">Updated ...</div>
-      </div>
     </div>
     <!-- /.container-fluid-->
     <!-- /.content-wrapper-->
@@ -193,6 +222,7 @@
     <script th:src="@{vendor/chart.js/Chart.min.js}"></script>
     <script th:src="@{vendor/datatables/jquery.dataTables.js}"></script>
     <script th:src="@{vendor/datatables/dataTables.bootstrap4.js}"></script>
+    <script th:src="@{vendor/moment/moment.js}"></script>
     <!-- Custom scripts for all pages-->
     <script th:src="@{js/sb-admin.js}"></script>
     <!-- Custom scripts for this page-->

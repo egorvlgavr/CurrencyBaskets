@@ -1,8 +1,10 @@
 package com.currencybaskets.api;
 
 import com.currencybaskets.dao.repository.UserRepository;
-import com.currencybaskets.dto.AmountHistoryDto;
+import com.currencybaskets.dto.HistoryDto;
+import com.currencybaskets.dto.RateHistoryDto;
 import com.currencybaskets.services.AccountService;
+import com.currencybaskets.services.RateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.currencybaskets.api.AccountController.USER_ID_FIXTURE;
@@ -23,6 +26,9 @@ public class HistoryController {
     private AccountService accountService;
 
     @Autowired
+    private RateService rateService;
+
+    @Autowired
     private UserRepository userRepository;
 
     @GetMapping("/history")
@@ -32,7 +38,7 @@ public class HistoryController {
 
     @GetMapping("/history/amount")
     @ResponseBody
-    public List<AmountHistoryDto> getAmountHistory(@RequestParam("from")String from) {
+    public List<HistoryDto> getAmountHistory(@RequestParam("from")String from) {
         List<Long> ids = userRepository.getUserIdsInSameGroup(USER_ID_FIXTURE);
         Date date = parseDateFromParam(from);
         if (Objects.isNull(date)) {
@@ -40,6 +46,16 @@ public class HistoryController {
         }
         return accountService.getAggregatedAmountHistory(ids, date);
     }
+
+  @GetMapping("/history/rates")
+  @ResponseBody
+  public List<RateHistoryDto> getRateHistory(@RequestParam("from")String from) {
+    Date date = parseDateFromParam(from);
+    if (Objects.isNull(date)) {
+      return rateService.getHistory();
+    }
+    return rateService.getHistory(parseDateFromParam(from));
+  }
 
     private static Date parseDateFromParam(String from) {
         ZonedDateTime now = ZonedDateTime.now();

@@ -5,15 +5,16 @@ Chart.defaults.global.defaultFontColor = '#292b2c';
 // -- Currency Pie Chart
 function drawPieChart() {
 
-    var jsonData = $.ajax({
+    $.ajax({
         url: '/aggregated/amount',
         dataType: 'json'
     }).done(function (results) {
 
-        var labels = [], data=[];
+        var labels = [], data=[], colors = [];
         results.forEach(function(packet) {
           labels.push(packet.currency);
           data.push(packet.amount);
+          colors.push(packet.color);
         });
 
         // Get the context of the canvas element we want to select
@@ -25,8 +26,7 @@ function drawPieChart() {
                 labels: labels,
                 datasets: [{
                     data: data,
-                    // TODO store Currency colors in database
-                    backgroundColor: ['#85bb65', '#1761DC', '#FF5C00'],
+                    backgroundColor: colors
                 }]
             }
         });

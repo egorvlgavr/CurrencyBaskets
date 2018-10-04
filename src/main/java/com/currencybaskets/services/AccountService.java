@@ -6,7 +6,7 @@ import com.currencybaskets.dao.repository.AccountRepository;
 import com.currencybaskets.dao.repository.RateRepository;
 import com.currencybaskets.dto.AccountUpdate;
 import com.currencybaskets.dto.AggregatedAmountDto;
-import com.currencybaskets.dto.AmountHistoryDto;
+import com.currencybaskets.dto.HistoryDto;
 import com.currencybaskets.view.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,11 +138,11 @@ public class AccountService {
     }
 
     @Transactional
-    public List<AmountHistoryDto> getAggregatedAmountHistory(List<Long> userIds, Date from) {
-        List<AmountHistoryDto> result = new ArrayList<>();
+    public List<HistoryDto> getAggregatedAmountHistory(List<Long> userIds, Date from) {
+        List<HistoryDto> result = new ArrayList<>();
         BigDecimal aggregatedAmount = accountRepository.sumOfBaseAmountsForUserIdsOnDate(userIds, from);
         if (Objects.nonNull(aggregatedAmount)) {
-            result.add(new AmountHistoryDto(from, aggregatedAmount));
+            result.add(new HistoryDto(from, aggregatedAmount));
         } else {
           aggregatedAmount = BigDecimal.ZERO;
         }
@@ -152,20 +152,20 @@ public class AccountService {
                 .collect(groupingBy(Account::getUpdated, TreeMap::new, toList()));
         for (Map.Entry<Date, List<Account>> dateToAccounts : groupedByDateAccounts.entrySet()) {
             aggregatedAmount = aggregatedAmount.add(calculateAggregatedAmountChanges(dateToAccounts.getValue()));
-            result.add(new AmountHistoryDto(dateToAccounts.getKey(), aggregatedAmount));
+            result.add(new HistoryDto(dateToAccounts.getKey(), aggregatedAmount));
         }
         return result;
     }
 
-    public List<AmountHistoryDto> getAggregatedAmountHistory(List<Long> userIds) {
-      List<AmountHistoryDto> result = new ArrayList<>();
+    public List<HistoryDto> getAggregatedAmountHistory(List<Long> userIds) {
+      List<HistoryDto> result = new ArrayList<>();
       List<Account> updates = accountRepository.findByUserIdIn(userIds);
       TreeMap<Date, List<Account>> groupedByDateAccounts = updates.stream()
           .collect(groupingBy(Account::getUpdated, TreeMap::new, toList()));
       BigDecimal aggregatedAmount = BigDecimal.ZERO;
       for (Map.Entry<Date, List<Account>> dateToAccounts : groupedByDateAccounts.entrySet()) {
         aggregatedAmount = aggregatedAmount.add(calculateAggregatedAmountChanges(dateToAccounts.getValue()));
-        result.add(new AmountHistoryDto(dateToAccounts.getKey(), aggregatedAmount));
+        result.add(new HistoryDto(dateToAccounts.getKey(), aggregatedAmount));
       }
       return result;
     }
