@@ -30,7 +30,7 @@ public class UpdateLatestRateScheduledTask {
 	private RateRepository rateRepository;
 
 	//Once per day
-	@Scheduled(fixedRate = 24 * 60 * 60 * 60 * 1000L)
+	@Scheduled(fixedRate = 24 * 60 * 60 * 1000L)
 	public void updateLatestRate() {
 		CurrencyRate currencyRate = fixer.getLatestRate();
 		if (!currencyRate.isSuccess()) {
