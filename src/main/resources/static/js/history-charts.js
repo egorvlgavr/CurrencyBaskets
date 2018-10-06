@@ -39,9 +39,6 @@ function drawAmountHistoryLineChart(fromParam) {
                 time: {
                   unit: 'date'
                 },
-                gridLines: {
-                  display: false
-                },
                 ticks: {
                   maxTicksLimit: 7
                 }
